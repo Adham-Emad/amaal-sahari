@@ -77,16 +77,28 @@ export function getServiceMetadata(slug: string): Metadata {
   if (!service) return buildMetadata({ path: `/services/${slug}` })
 
   const serviceData = service.en || {}
-  const seo = getPageSEO(`services/${slug}`)
+  const seo = service.seo?.en
 
-  return buildMetadata({
-    title: seo?.title || (serviceData.title ? `${serviceData.title} | ${SITE_NAME}` : undefined),
-    description: seo?.description || serviceData.description || undefined,
+  const title = seo?.metaTitle || (serviceData.title ? `${serviceData.title} | ${SITE_NAME}` : undefined)
+  const description = seo?.metaDescription || serviceData.description || undefined
+
+  const base = buildMetadata({
+    title,
+    description,
     keywords: seo?.keywords || undefined,
-    ogImage: seo?.ogImage || service.imageUrl || undefined,
-    canonicalUrl: seo?.canonicalUrl || undefined,
+    ogImage: service.imageUrl || undefined,
     path: `/services/${slug}`,
   })
+
+  if (seo?.ogTitle || seo?.ogDescription) {
+    base.openGraph = {
+      ...base.openGraph,
+      title: seo.ogTitle || title,
+      description: seo.ogDescription || description,
+    }
+  }
+
+  return base
 }
 
 export function getCustomPageMetadata(slug: string): Metadata {
