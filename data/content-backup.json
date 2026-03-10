@@ -115,7 +115,7 @@
         "imageUrl": "",
         "en": {
           "title": "Corporate Office Transformation",
-          "description": "Reduced cleaning complaints by 95% and improved employee satisfaction",
+          "description": "Reduced cleaning complaints by 95% and improved employee satisfaction Reduced cleaning complaints by 95% and improved employee satisfaction Reduced cleaning complaints by 95% and improved employee satisfaction Reduced cleaning complaints by 95% and improved employee satisfaction Reduced cleaning complaints by 95% and improved employee satisfaction Reduced cleaning complaints by 95% and improved employee satisfaction",
           "metrics": "95% reduction in complaints",
           "challenges": "The client's corporate office was experiencing high employee complaints about cleanliness standards, which was affecting workplace morale and productivity. The facility had inadequate cleaning schedules and lacked modern cleaning protocols.",
           "solution": "We implemented a comprehensive cleaning program with daily deep cleaning, enhanced sanitization protocols, and modern cleaning equipment. We established clear cleaning schedules, trained staff on best practices, and introduced a quality assurance system with regular inspections.",
@@ -278,7 +278,7 @@
       {
         "id": "1",
         "slug": "housekeeping-janitorial",
-        "imageUrl": "",
+        "imageUrl": "/uploads/1773183597185-6b2dff61.jpg?v=1773183600526",
         "en": {
           "title": "Housekeeping & Janitorial",
           "description": "Professional cleaning services for your premises"
@@ -888,7 +888,7 @@
     "navigation": {
       "en": [
         {
-          "label": "Home",
+          "label": "Home ",
           "href": "/"
         },
         {
@@ -1063,5 +1063,5 @@
     }
   ],
   "_testMarker": 1773181279922,
-  "_e2eTestMarker": "e2e-1773182575330"
+  "_e2eTestMarker": "e2e-1773182919076"
 }
