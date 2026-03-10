@@ -10,7 +10,7 @@ export default function SEOMetadata() {
 
   useEffect(() => {
     const seoConfig = content.seo
-    const baseUrl = 'https://amaalsahari.com'
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://amaalsahari.com'
     const currentUrl = `${baseUrl}${pathname}`
 
     // Get page-specific SEO or use general settings

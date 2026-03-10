@@ -285,13 +285,10 @@ export async function POST(request: NextRequest) {
       // Admin approval email will be sent AFTER admin is found and ready to approve
       const smtpConfig = getSMTPConfig()
       if (!smtpConfig) {
-        console.log('[v0] SMTP not configured - returning demo token for testing')
         return NextResponse.json({
-          success: true,
-          message: 'Reset link is ready. Email service not configured. Contact administrator to configure email settings.',
-          token: resetToken,
-          demoMode: true,
-        })
+          success: false,
+          error: 'Email service is not configured. Password reset requires SMTP settings. Please contact the administrator.',
+        }, { status: 503 })
       }
 
       // Send ONLY the reset email to user (admin approval email will be sent when user accesses the reset link)
@@ -310,7 +307,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         message: 'Reset link has been sent to your email address.',
-        token: resetToken,
       })
 
     } else if (action === 'approve-admin') {

@@ -54,21 +54,13 @@ export default function Footer() {
           <div>
             <h3 className="font-bold mb-4">{t.footer.services}</h3>
             <ul className="space-y-2 text-sm text-[#FAFBF0]/80">
-              <li>
-                <Link href="/services/housekeeping-janitorial" className="hover:text-[#EA8936] transition-colors">
-                  {t.footer.housekeeping || "Housekeeping"}
-                </Link>
-              </li>
-              <li>
-                <Link href="/services/hospitality-services" className="hover:text-[#EA8936] transition-colors">
-                  {t.footer.hospitality || "Hospitality"}
-                </Link>
-              </li>
-              <li>
-                <Link href="/services/manned-security" className="hover:text-[#EA8936] transition-colors">
-                  {t.footer.security || "Security"}
-                </Link>
-              </li>
+              {(content.services?.items || []).slice(0, 3).map((service) => (
+                <li key={service.id}>
+                  <Link href={`/services/${service.slug}`} className="hover:text-[#EA8936] transition-colors">
+                    {service[locale]?.title || service.en?.title}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
           <div>
@@ -114,7 +106,7 @@ export default function Footer() {
         rel="noopener noreferrer"
         className="hover:text-[#EA8936] transition-colors"
       >
-        {content.contact.whatsapp || "+201021454545"}
+        {content.contact.whatsapp || ""}
       </a>
     </li>
   </ul>

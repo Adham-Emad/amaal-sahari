@@ -2,12 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
+import { createSessionToken, setSessionCookie } from '@/lib/auth'
 
 const ADMIN_USERNAME = 'admin'
-const DEFAULT_PASSWORD = 'amaal2024'
 const CREDENTIALS_FILE = path.join(process.cwd(), '.admin-credentials.json')
 
-// Simple secure password hashing using crypto (no native bindings needed)
 function hashPassword(password: string, salt?: string): string {
   const useSalt = salt || crypto.randomBytes(16).toString('hex')
   const hash = crypto
@@ -16,7 +15,6 @@ function hashPassword(password: string, salt?: string): string {
   return `${useSalt}$${hash}`
 }
 
-// Verify password against hash
 function verifyPassword(password: string, storedHash: string): boolean {
   try {
     const [salt, hash] = storedHash.split('$')
@@ -30,34 +28,18 @@ function verifyPassword(password: string, storedHash: string): boolean {
   }
 }
 
-// Get stored password hash from file, or return default if not exists
 function getAdminPasswordHash(): string {
   try {
     if (fs.existsSync(CREDENTIALS_FILE)) {
       const data = fs.readFileSync(CREDENTIALS_FILE, 'utf-8')
       const creds = JSON.parse(data)
-      // Support both field names for backwards compatibility
       return creds.hashedPassword || creds.password
     }
   } catch (error) {
     console.error('[v0] Error reading credentials file:', error)
   }
   
-  // Initialize with default password on first run
-  try {
-    const hashedDefault = hashPassword(DEFAULT_PASSWORD)
-    fs.writeFileSync(CREDENTIALS_FILE, JSON.stringify({
-      username: ADMIN_USERNAME,
-      hashedPassword: hashedDefault,
-      updatedAt: new Date().toISOString(),
-      initialized: true
-    }, null, 2))
-    console.log('[v0] Initialized credentials file with default password')
-    return hashedDefault
-  } catch (error) {
-    console.error('[v0] Failed to initialize credentials:', error)
-    return ''
-  }
+  return ''
 }
 
 export async function POST(request: NextRequest) {
@@ -72,48 +54,49 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check username
     if (username !== ADMIN_USERNAME) {
-      console.log('[v0] Invalid username attempt:', username)
       return NextResponse.json(
         { error: 'Invalid username or password' },
         { status: 401 }
       )
     }
 
-    // Get stored password hash
     const storedHash = getAdminPasswordHash()
     if (!storedHash) {
       return NextResponse.json(
-        { error: 'Authentication service error' },
+        { error: 'No admin account configured. Please set up admin credentials.' },
         { status: 500 }
       )
     }
 
-    // Compare password with hash
     const isValid = verifyPassword(password, storedHash)
 
     if (!isValid) {
-      console.log('[v0] Invalid password attempt for user:', username)
       return NextResponse.json(
         { error: 'Invalid username or password' },
         { status: 401 }
       )
     }
 
+    const token = createSessionToken()
+    const cookie = setSessionCookie(token)
+
     console.log('[v0] Admin login successful')
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: 'Login successful',
       username: ADMIN_USERNAME,
     })
 
+    response.cookies.set(cookie.name, cookie.value, cookie.options as any)
+
+    return response
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error)
     console.error('[v0] Login API error:', errorMsg)
     
     return NextResponse.json(
-      { error: 'Failed to process login', details: errorMsg },
+      { error: 'Failed to process login' },
       { status: 500 }
     )
   }

@@ -10,6 +10,8 @@ import { CheckCircle } from "lucide-react"
 export default function ContactForm() {
   const { locale } = useLocale()
   const [submitted, setSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState("")
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -28,7 +30,9 @@ export default function ContactForm() {
       service: "Service Interest",
       message: "Message",
       submit: "Send Message",
+      submitting: "Sending...",
       success: "Thank you! We'll be in touch soon.",
+      error: "Failed to send message. Please try again.",
     },
     ar: {
       name: "الاسم الكامل",
@@ -38,7 +42,9 @@ export default function ContactForm() {
       service: "اهتمام الخدمة",
       message: "الرسالة",
       submit: "إرسال الرسالة",
+      submitting: "جارِ الإرسال...",
       success: "شكراً! سنتواصل معك قريباً.",
+      error: "فشل إرسال الرسالة. يرجى المحاولة مرة أخرى.",
     },
   }
 
@@ -49,31 +55,36 @@ export default function ContactForm() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    // Save to localStorage for CMS access
-    const submission = {
-      id: `submission_${Date.now()}`,
-      ...formData,
-      submittedAt: new Date().toLocaleString(),
-      read: false,
-    }
-    
+    setError("")
+    setIsSubmitting(true)
+
     try {
-      const existing = JSON.parse(localStorage.getItem("contact_submissions") || "[]")
-      const updated = [submission, ...existing]
-      localStorage.setItem("contact_submissions", JSON.stringify(updated))
-    } catch (error) {
-      console.error("Failed to save submission:", error)
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.error || t.error)
+        setIsSubmitting(false)
+        return
+      }
+
+      setSubmitted(true)
+      setTimeout(() => {
+        setSubmitted(false)
+        setFormData({ name: "", email: "", phone: "", company: "", service: "", message: "" })
+      }, 3000)
+    } catch {
+      setError(t.error)
+    } finally {
+      setIsSubmitting(false)
     }
-    
-    console.log("Form submitted:", formData)
-    setSubmitted(true)
-    setTimeout(() => {
-      setSubmitted(false)
-      setFormData({ name: "", email: "", phone: "", company: "", service: "", message: "" })
-    }, 3000)
   }
 
   if (submitted) {
@@ -87,6 +98,12 @@ export default function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+          {error}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-muted-foreground mb-2">{t.name}</label>
@@ -170,8 +187,8 @@ export default function ContactForm() {
         />
       </div>
 
-      <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-white">
-        {t.submit}
+      <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-white" disabled={isSubmitting}>
+        {isSubmitting ? t.submitting : t.submit}
       </Button>
     </form>
   )

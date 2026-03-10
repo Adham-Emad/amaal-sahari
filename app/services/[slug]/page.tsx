@@ -22,15 +22,19 @@ export default function ServicePage() {
 
   if (!service || !serviceData) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">Service Not Found</h1>
-          <p className="text-foreground-secondary mb-8">The service you're looking for doesn't exist.</p>
-          <Link href="/services">
-            <Button>Go Back to Services</Button>
-          </Link>
+      <>
+        <Navbar />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold mb-4">{isArabic ? "الخدمة غير موجودة" : "Service Not Found"}</h1>
+            <p className="text-foreground-secondary mb-8">{isArabic ? "الخدمة التي تبحث عنها غير موجودة." : "The service you're looking for doesn't exist."}</p>
+            <Link href="/services">
+              <Button>{isArabic ? "العودة للخدمات" : "Go Back to Services"}</Button>
+            </Link>
+          </div>
         </div>
-      </div>
+        <Footer />
+      </>
     )
   }
 

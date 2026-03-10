@@ -21,34 +21,14 @@ export default function AdminLogin() {
     setIsLoading(true)
 
     try {
-      // First verify credentials with backend API
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.error || "Invalid username or password")
-        setIsLoading(false)
-        return
-      }
-
-      // Backend verified credentials successfully, now create session
-      const success = login(username, password)
+      const success = await login(username, password)
       if (!success) {
-        console.error("[v0] Client login failed even though API verified")
-        setError("Session initialization failed")
+        setError("Invalid username or password")
         setIsLoading(false)
         return
       }
       
-      // Small delay to ensure session is fully initialized before redirect
-      setTimeout(() => {
-        window.location.href = "/admin"
-      }, 100)
+      window.location.href = "/admin"
     } catch (error) {
       console.error("[v0] Login error:", error)
       setError("Login failed. Please try again.")

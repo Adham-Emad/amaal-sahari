@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import * as fs from 'fs'
 import * as path from 'path'
 import crypto from 'crypto'
+import { requireAuth } from '@/lib/auth'
 
 const CREDENTIALS_FILE = path.join(process.cwd(), '.admin-credentials.json')
 
@@ -70,11 +71,15 @@ const writeCredentials = (username: string, plainPassword: string): boolean => {
 }
 
 export async function POST(request: NextRequest) {
+  const isAuthed = await requireAuth()
+  if (!isAuthed) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const body = await request.json()
     const { action, username, currentPassword, newPassword } = body
 
-    // Validate input
     if (!action || !username) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },

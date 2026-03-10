@@ -7,12 +7,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Lock, ArrowLeft, AlertCircle, CheckCircle, Mail } from "lucide-react"
-import { useAdmin } from "@/lib/admin-context"
-
 export function ForgotPasswordClient() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { resetPassword } = useAdmin()
   
   const [step, setStep] = useState<"email" | "confirmation" | "reset" | "waiting-approval">("email")
   const [email, setEmail] = useState("")

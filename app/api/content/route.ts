@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs'
 import path from 'path'
+import { requireAuth } from '@/lib/auth'
 
 // File-based persistent storage with Hostinger optimization
 const DATA_DIR = path.join(process.cwd(), 'data')
@@ -391,8 +392,12 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST: Save centralized content to persistent file storage (IMPROVED for large files)
 export async function POST(request: NextRequest) {
+  const isAuthed = await requireAuth()
+  if (!isAuthed) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const startTime = Date.now()
     

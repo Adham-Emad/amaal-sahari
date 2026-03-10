@@ -12,30 +12,28 @@ interface LocaleContextType {
 
 const LocaleContext = createContext<LocaleContextType | undefined>(undefined)
 
+function getInitialLocale(): Locale {
+  if (typeof window !== 'undefined') {
+    try {
+      const saved = localStorage.getItem("locale") as Locale | null
+      if (saved === "ar" || saved === "en") return saved
+    } catch {}
+  }
+  return "en"
+}
+
 export function LocaleProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("en")
-  const [mounted, setMounted] = useState(false)
+  const [locale, setLocaleState] = useState<Locale>(getInitialLocale)
 
   useEffect(() => {
-    // Get saved locale from localStorage
-    const saved = localStorage.getItem("locale") as Locale | null
-    const initial = saved || "en"
-    setLocaleState(initial)
-
-    // Update document attributes
-    document.documentElement.lang = initial
-    document.documentElement.dir = initial === "ar" ? "rtl" : "ltr"
-    document.documentElement.setAttribute("data-locale", initial)
-
-    setMounted(true)
-  }, [])
+    document.documentElement.lang = locale
+    document.documentElement.dir = locale === "ar" ? "rtl" : "ltr"
+    document.documentElement.setAttribute("data-locale", locale)
+  }, [locale])
 
   const setLocale = (newLocale: Locale) => {
     setLocaleState(newLocale)
     localStorage.setItem("locale", newLocale)
-    document.documentElement.lang = newLocale
-    document.documentElement.dir = newLocale === "ar" ? "rtl" : "ltr"
-    document.documentElement.setAttribute("data-locale", newLocale)
   }
 
   return (

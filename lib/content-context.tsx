@@ -3,26 +3,15 @@
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 
-// Cache busting utility - adds timestamp to image URLs to force fresh loads
-function addCacheBuster(url: string | undefined): string | undefined {
-  if (!url || url.startsWith('data:') || url.startsWith('blob:')) {
-    return url
-  }
-  
-  // If URL already has query params, append with &, otherwise use ?
-  const separator = url.includes('?') ? '&' : '?'
-  const timestamp = new Date().getTime()
-  return `${url}${separator}v=${timestamp}`
-}
+let cacheBustVersion = 0
 
-// Recursively add cache busters to all image URLs in an object
 function bustImageCaches(obj: any): any {
   if (!obj) return obj
   
   if (typeof obj === 'string') {
-    // Check if this might be an image URL
-    if (obj.includes('blob.vercel') || obj.includes('http') || obj.startsWith('/images')) {
-      return addCacheBuster(obj)
+    if (obj.startsWith('/uploads/') || obj.startsWith('/images/')) {
+      const separator = obj.includes('?') ? '&' : '?'
+      return `${obj}${separator}v=${cacheBustVersion}`
     }
     return obj
   }
@@ -34,12 +23,7 @@ function bustImageCaches(obj: any): any {
   if (typeof obj === 'object') {
     const result: any = {}
     for (const key of Object.keys(obj)) {
-      // Keys that typically contain image URLs
-      if (key.includes('image') || key.includes('Url') || key.includes('url') || key.includes('logo')) {
-        result[key] = bustImageCaches(obj[key])
-      } else {
-        result[key] = bustImageCaches(obj[key])
-      }
+      result[key] = bustImageCaches(obj[key])
     }
     return result
   }
@@ -407,7 +391,7 @@ const defaultContent: SiteContent = {
     items: [
       {
         id: "1",
-        imageUrl: "/images/case-study-corporate-transformation.jpg",
+        imageUrl: "",
         en: {
           title: "Corporate Office Transformation",
           description: "Reduced cleaning complaints by 95% and improved employee satisfaction",
@@ -427,7 +411,7 @@ const defaultContent: SiteContent = {
       },
       {
         id: "2",
-        imageUrl: "/images/case-study-hospitality-excellence.jpg",
+        imageUrl: "",
         en: {
           title: "Hospitality Excellence",
           description: "Faster response times and improved guest experience ratings",
@@ -447,7 +431,7 @@ const defaultContent: SiteContent = {
       },
       {
         id: "3",
-        imageUrl: "/images/case-study-facility-optimization.jpg",
+        imageUrl: "",
         en: {
           title: "Facility Optimization",
           description: "Streamlined operations and cost savings through integrated services",
@@ -468,7 +452,7 @@ const defaultContent: SiteContent = {
     ],
   },
   whyChooseUs: {
-    imageUrl: "/images/hospitality-excellence-why-us.jpg",
+    imageUrl: "",
     items: [
       {
         id: "1",
@@ -496,25 +480,25 @@ const defaultContent: SiteContent = {
     pillars: [
       {
         id: "1",
-        imageUrl: "/images/hygiene-excellence.png",
+        imageUrl: "",
         en: { title: "Hygiene Excellence", description: "Maintaining highest cleanliness standards" },
         ar: { title: "التميز في النظافة", description: "الحفاظ على أعلى معايير النظافة" },
       },
       {
         id: "2",
-        imageUrl: "/images/reliability.png",
+        imageUrl: "",
         en: { title: "Reliability", description: "Consistent and dependable service delivery" },
         ar: { title: "الموثوقية", description: "تقديم خدمة متسقة وموثوقة" },
       },
       {
         id: "3",
-        imageUrl: "/images/sustainability.png",
+        imageUrl: "",
         en: { title: "Sustainability", description: "Eco-friendly practices and green solutions" },
         ar: { title: "الاستدامة", description: "ممارسات صديقة للبيئة وحلول خضراء" },
       },
       {
         id: "4",
-        imageUrl: "/images/compliance.png",
+        imageUrl: "",
         en: { title: "Compliance", description: "Full regulatory and safety compliance" },
         ar: { title: "الامتثال", description: "الامتثال الكامل للوائح والسلامة" },
       },
@@ -525,49 +509,49 @@ const defaultContent: SiteContent = {
       {
         id: "1",
         slug: "housekeeping-janitorial",
-        imageUrl: "/images/housekeeping-janitorial.png",
+        imageUrl: "",
         en: { title: "Housekeeping & Janitorial", description: "Professional cleaning services for your premises" },
         ar: { title: "التدبير المنزلي والنظافة", description: "خدمات ��نظيف احترافية لمبانيك" },
       },
       {
         id: "2",
         slug: "hospitality-services",
-        imageUrl: "/images/hospitality-services.png",
+        imageUrl: "",
         en: { title: "Hospitality Services", description: "Premium hospitality and guest services" },
         ar: { title: "خدمات الضيافة", description: "خدمات ضيافة وضيوف متميزة" },
       },
       {
         id: "3",
         slug: "landscaping-plants",
-        imageUrl: "/images/landscaping-plants.png",
+        imageUrl: "",
         en: { title: "Landscaping & Plants", description: "Beautiful outdoor spaces and greenery" },
         ar: { title: "تنسيق الحدائق والنباتات", description: "مساحات خارجية جميلة ومساحات خضراء" },
       },
       {
         id: "4",
         slug: "pest-control",
-        imageUrl: "/images/pest-control-outdoor.png",
+        imageUrl: "",
         en: { title: "Pest Control", description: "Effective pest management solutions" },
         ar: { title: "مكافحة الآفات", description: "حلول فعالة لإدارة الآفات" },
       },
       {
         id: "5",
         slug: "facade-cleaning",
-        imageUrl: "/images/facade-cleaning.png",
+        imageUrl: "",
         en: { title: "Facade Cleaning", description: "Professional exterior cleaning services" },
         ar: { title: "تنظيف الواجهات", description: "خدمات تنظيف خارجية احترافية" },
       },
       {
         id: "6",
         slug: "waste-management",
-        imageUrl: "/images/waste-management.png",
+        imageUrl: "",
         en: { title: "Waste Management", description: "Efficient waste disposal and recycling" },
         ar: { title: "إدارة النفايات", description: "التخلص الفعال من النفايات وإعادة التدوير" },
       },
       {
         id: "7",
         slug: "manned-security",
-        imageUrl: "/images/manned-security.png",
+        imageUrl: "",
         en: { title: "Manned Security", description: "Professional security personnel services" },
         ar: { title: "الأمن المأهول", description: "خدمات أفراد الأمن المحترفين" },
       },
@@ -652,28 +636,28 @@ const defaultContent: SiteContent = {
     posts: [
       {
         id: "1",
-        imageUrl: "/images/office-cleaning.png",
+        imageUrl: "",
         date: "2025-01-15",
         en: { title: "The Importance of Cleanliness in the Workplace", excerpt: "Learn how to improve your workplace environment by maintaining high cleanliness standards.", fullContent: "A clean workplace is essential for employee well-being, productivity, and safety. Regular cleaning reduces the spread of germs and illnesses, improves air quality, and creates a professional appearance for clients and visitors.\n\nProper cleaning routines should include:\n- Daily surface disinfection\n- Regular carpet and floor maintenance\n- Windows and glass cleaning\n- Break room sanitation\n- Bathroom deep cleaning\n\nInvesting in professional cleaning services ensures your workplace maintains the highest standards of cleanliness and hygiene.", author: "Ahmed Mohamed", category: "Cleanliness" },
         ar: { title: "أهمية النظافة في مكان العمل", excerpt: "تعرف على كيفية تحسين بيئة العمل من خلال الحفاظ على معايير النظافة العالية.", fullContent: "المساحة النظيفة ضرورية لرفاهية الموظفين والإنتاجية والسلامة. التنظيف المنتظم يقلل انتشار الجراثيم والأمراض ويحسن جودة الهواء ويخلق مظهراً احترافياً للعملاء والزوار.\n\nيجب أن تشمل روتينات التنظيف الصحيحة:\n- تطهير السطح اليومي\n- صيانة السجاد والأرضيات المنتظمة\n- تنظيف النوافذ والزجاج\n- تعقيم غرفة الاستراحة\n- التنظيف العميق للحمامات\n\nالاستثمار في خدمات التنظيف الاحترافية يضمن أن مكان عملك يحافظ على أعلى معايير النظافة والصحة.", author: "أحمد محمد", category: "النظافة" },
       },
       {
         id: "2",
-        imageUrl: "/images/recycling-waste-management.png",
+        imageUrl: "",
         date: "2025-01-10",
         en: { title: "Sustainable Waste Management Strategies", excerpt: "Explore best practices for managing waste in an eco-friendly and cost-effective manner.", fullContent: "Effective waste management is crucial for environmental sustainability and operational efficiency. Organizations that implement proper waste management systems can reduce costs, improve their environmental footprint, and enhance their corporate image.\n\nKey waste management strategies include:\n- Waste segregation and recycling programs\n- Composting organic materials\n- Reducing single-use plastics\n- Partnering with certified waste disposal companies\n- Employee training on waste reduction\n- Monitoring and reporting waste metrics\n\nBy adopting sustainable waste practices, your organization can contribute to environmental conservation while improving operational efficiency.", author: "Fatima Ali", category: "Environment" },
         ar: { title: "استراتيجيات إدارة النفايات المستدامة", excerpt: "استكشف أفضل الممارسات لإدارة النفايات بطريقة صديقة للبيئة وفعالة.", fullContent: "إدارة النفايات الفعالة ضرورية للاستدامة البيئية والكفاءة التشغيلية. يمكن للمنظمات التي تنفذ أنظمة إدارة النفايات الصحيحة تقليل التكاليف وتحسين بصمتها البيئية وتعزيز صورتها المؤسسية.\n\nتشمل استراتيجيات إدارة النفايات الرئيسية:\n- فصل النفايات وبرامج إعادة التدوير\n- تسميد المواد العضوية\n- تقليل البلاستيك يحد الاستخدام\n- الشراكة مع شركات التخلص من النفايات المعتمدة\n- تدريب الموظفين على تقليل النفايات\n- مراقبة وإبلاغ مقاييس النفايات\n\nبتبني ممارسات النفايات المستدامة، يمكن لمنظمتك المساهمة في حماية البيئة مع تح����ين الكفاءة التشغيلية.", author: "فاطمة علي", category: "البيئة" },
       },
       {
         id: "3",
-        imageUrl: "/images/security-professional.png",
+        imageUrl: "",
         date: "2025-01-05",
         en: { title: "Security and Safety in Commercial Facilities", excerpt: "Important tips for enhancing security and safety in your commercial facilities.", fullContent: "Security and safety are paramount concerns for any commercial facility. A comprehensive security strategy protects your assets, employees, and visitors while providing peace of mind.\n\nEssential security measures include:\n- Regular facility inspections and risk assessments\n- CCTV surveillance systems\n- Access control and visitor management\n- Emergency response procedures\n- Staff training on safety protocols\n- Regular security audits\n- Lighting and perimeter security\n- Clear emergency evacuation plans\n\nImplementing these measures creates a secure environment that allows your business to operate efficiently and your team to feel safe at work.", author: "Mahmoud Ahmed", category: "Security" },
         ar: { title: "الأمن والسلامة في المرافق التجارية", excerpt: "نصائح مهمة لتحسين الأمن والسلامة في مرافقك التجارية.", fullContent: "الأمن والسلامة من الاهتمامات القصوى لأي منشأة تجارية. تحمي استراتيجية الأمن الشاملة أصولك وموظفيك والزوار مع توفير راحة البال.\n\nتشمل التدابير الأمنية الأساسية:\n- عمليات التفتيش الدورية وتقييمات المخاطر\n- أنظمة المراقبة بالكاميرا\n- التحكم في الوصول وإدارة الزوار\n- إجراءات الاستجابة للطوارئ\n- تدريب الموظفين على بروتوكولات السلامة\n- عمليات تدقيق الأمن المنتظمة\n- الإضاءة وأمن المحيط\n- خطط إخلاء الطوارئ الواضحة\n\nيخلق تنفيذ هذه التدابير بيئة آمنة تسمح لعملك بالعمل بكفاءة وتشعر فريقك بالأمان في العمل.", author: "محمود أحمد", category: "الأمن" },
       },
       {
         id: "4",
-        imageUrl: "/images/business-meeting.png",
+        imageUrl: "",
         date: "2024-12-28",
         en: { title: "High-Quality Hospitality Services", excerpt: "How to provide exceptional hospitality services to your guests and employees.", fullContent: "Exceptional hospitality services set your business apart from competitors and create lasting impressions with guests and employees. Quality hospitality encompasses cleanliness, professionalism, and attention to detail.\n\nKey elements of high-quality hospitality include:\n- Professional and courteous staff\n- Immaculate facility cleanliness\n- Comfortable and well-maintained spaces\n- Responsive customer service\n- Attention to guest preferences\n- Quality refreshments and amenities\n- Regular staff training and development\n- Consistent service standards\n\nInvesting in hospitality excellence demonstrates your commitment to quality and creates positive experiences that encourage repeat business and referrals.", author: "Layla Mahmoud", category: "Hospitality" },
         ar: { title: "الخدمات الفندقية ذات الجودة العالية", excerpt: "كيفية توفير خدمات فندقية متميزة لضيوفك وموظفيك.", fullContent: "تميز خدمات الضيافة الاستثنائية عملك عن المنافسين وتخلق انطباعات دائمة لدى الضيوف والموظفين. تشمل الضيافة الجودة على النظافة والاحترافية والاهتمام بالتفاصيل.\n\nتشمل العناصر الرئيسية للضيافة عالية الجودة:\n- الموظفون المحترفون والمهذبون\n- نظافة المنشأة النقية\n- المساحات المريحة والصيانة الجيدة\n- خدمة العملاء سريعة الاستجابة\n- الاهتمام بتفضيلات الضيوف\n- المرطبات والمرافق عالية الجودة\n- تدريب الموظفين والتطوير المنتظم\n- معايير الخدمة المتسقة\n\nالاستثمار في تميز الضيافة يدل على التزامك بالجودة وينشئ تجارب إيجابية تشجع الأعمال المتكررة والإحالات.", author: "ليلى محمود", category: "الخدمات الفندقية" },
@@ -684,7 +668,7 @@ const defaultContent: SiteContent = {
     items: [
       {
         id: "1",
-        imageUrl: "/images/office-cleaning.png",
+        imageUrl: "",
         date: "2025-02-10",
         en: {
           title: "Amaal Sahari Launches New Green Cleaning Initiative",
@@ -703,7 +687,7 @@ const defaultContent: SiteContent = {
       },
       {
         id: "2",
-        imageUrl: "/images/facility-management.png",
+        imageUrl: "",
         date: "2025-02-05",
         en: {
           title: "Excellence in Facility Management Recognized",
@@ -1200,12 +1184,13 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
   }
 
   const updateSection = <K extends keyof SiteContent>(section: K, data: SiteContent[K]) => {
-    // Apply cache busting to all image URLs when updating
+    cacheBustVersion = Date.now()
     const bustData = bustImageCaches(data)
     saveContent({ ...content, [section]: bustData })
   }
 
   const updateContact = (contact: SiteContent["contact"]) => {
+    cacheBustVersion = Date.now()
     const bustData = bustImageCaches(contact)
     saveContent({ ...content, contact: bustData })
   }

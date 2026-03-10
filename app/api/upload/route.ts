@@ -3,6 +3,7 @@ import sharp from 'sharp'
 import fs from 'fs'
 import path from 'path'
 import crypto from 'crypto'
+import { requireAuth } from '@/lib/auth'
 
 // Increase timeout for large file uploads
 export const maxDuration = 120 // 120 seconds for upload + processing
@@ -33,6 +34,11 @@ function generateFilename(originalName: string, fileType: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  const isAuthed = await requireAuth()
+  if (!isAuthed) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     console.log('[v0] Upload endpoint called - NEW FILE STORAGE MODE')
     
