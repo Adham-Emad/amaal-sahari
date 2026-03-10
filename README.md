@@ -35,7 +35,7 @@ A Next.js 16 website for Amaal Sahari, an integrated facility management company
 
 ## Environment Variables
 
-The app uses the following secrets (set via Replit Secrets):
+The app uses the following environment variables:
 - `SESSION_SECRET` - Required for session token signing
 - `HOSTINGER_SMTP_HOST` - SMTP host for email sending
 - `HOSTINGER_SMTP_PORT` - SMTP port (default 465)
@@ -50,8 +50,7 @@ The app uses the following secrets (set via Replit Secrets):
 - **Build**: `npm run build`
 - **Start**: `npm run start` (runs on port 5000)
 
-## Replit Configuration
+## Deployment
 
-- Workflow: "Start application" → `npm run dev` on port 5000
-- Next.js configured to listen on `0.0.0.0:5000` for Replit proxy compatibility
-- `allowedDevOrigins` configured for Replit domains
+- Workflow: "Start application" runs `npm run dev` on port 5000
+- Next.js configured to listen on `0.0.0.0:5000`

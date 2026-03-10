@@ -6,7 +6,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  allowedDevOrigins: ['*.replit.dev', '*.janeway.replit.dev'],
+  allowedDevOrigins: ['*'],
   async redirects() {
     return [
       {
