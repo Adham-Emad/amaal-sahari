@@ -1,5 +1,15 @@
 [
   {
+    "id": "submission_1773182939095",
+    "name": "E2E Test User",
+    "email": "e2e@test.com",
+    "phone": "+1234567890",
+    "company": "",
+    "service": "",
+    "message": "This is an automated E2E test submission.",
+    "submittedAt": "2026-03-10T22:48:59.095Z"
+  },
+  {
     "id": "submission_1773182769072",
     "name": "E2E Test User",
     "email": "e2e@test.com",

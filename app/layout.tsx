@@ -33,7 +33,6 @@ export default function RootLayout({
         <link rel="icon" href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Amaal%20Sahari%20Web%20Logo-JeTkcT88yuJW3ZTgu8RnID1sBhHFbs.png" type="image/png" />
         <link rel="apple-touch-icon" href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Amaal%20Sahari%20Web%20Logo-JeTkcT88yuJW3ZTgu8RnID1sBhHFbs.png" />
         <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
-        <script dangerouslySetInnerHTML={{ __html: `try{var l=localStorage.getItem("locale");if(l==="ar"){document.documentElement.lang="ar";document.documentElement.dir="rtl";document.documentElement.setAttribute("data-locale","ar")}}catch(e){}` }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

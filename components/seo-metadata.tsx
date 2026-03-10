@@ -57,8 +57,8 @@ export default function SEOMetadata() {
     }
     canonicalLink.href = canonicalUrl
 
-    // Load Google Analytics if ID exists
-    if (seoConfig.integrations.googleAnalyticsId) {
+    // Load Google Analytics if ID exists (only once)
+    if (seoConfig.integrations.googleAnalyticsId && !document.querySelector(`script[src*="googletagmanager.com/gtag/js?id=${seoConfig.integrations.googleAnalyticsId}"]`)) {
       const gaScript = document.createElement('script')
       gaScript.async = true
       gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${seoConfig.integrations.googleAnalyticsId}`
@@ -72,8 +72,8 @@ export default function SEOMetadata() {
       gtag('config', seoConfig.integrations.googleAnalyticsId)
     }
 
-    // Load Google Tag Manager if ID exists
-    if (seoConfig.integrations.googleTagManagerId) {
+    // Load Google Tag Manager if ID exists (only once)
+    if (seoConfig.integrations.googleTagManagerId && !document.querySelector(`script[src*="googletagmanager.com/gtag/js?id=${seoConfig.integrations.googleTagManagerId}"]`)) {
       const gtmScript = document.createElement('script')
       gtmScript.async = true
       gtmScript.src = `https://www.googletagmanager.com/gtag/js?id=${seoConfig.integrations.googleTagManagerId}`

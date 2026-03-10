@@ -52,6 +52,8 @@ A Next.js 16 bilingual (Arabic/English) website for "Amaal Sahari" — an integr
 - **Port**: 5000 with `-H 0.0.0.0`
 - **Package Manager**: npm
 - **Run**: `npm run dev`
+- **Dev Origins**: `next.config.mjs` has `allowedDevOrigins` configured for Replit's iframe proxy (uses `REPLIT_DEV_DOMAIN` env var + wildcard patterns)
+- **Hydration**: Locale initialization deferred to `useEffect` in `LocaleProvider` to prevent SSR/client mismatch. No inline locale scripts in layout.
 
 ## Content Model Notes
 - `homepageSections` entries have `en/ar` objects with `title` and optional `subtitle`

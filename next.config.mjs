@@ -6,7 +6,15 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  allowedDevOrigins: ['*'],
+  allowedDevOrigins: [
+    process.env.REPLIT_DEV_DOMAIN,
+    '*.replit.dev',
+    '*.janeway.replit.dev',
+    '*.kirk.replit.dev',
+    '*.repl.co',
+    'localhost',
+    '127.0.0.1',
+  ].filter(Boolean),
   async redirects() {
     return [
       {
