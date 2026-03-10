@@ -1,0 +1,42 @@
+[
+  {
+    "id": "submission_1773182769072",
+    "name": "E2E Test User",
+    "email": "e2e@test.com",
+    "phone": "+1234567890",
+    "company": "",
+    "service": "",
+    "message": "This is an automated E2E test submission.",
+    "submittedAt": "2026-03-10T22:46:09.072Z"
+  },
+  {
+    "id": "submission_1773182665056",
+    "name": "E2E Test User",
+    "email": "e2e@test.com",
+    "phone": "+1234567890",
+    "company": "",
+    "service": "",
+    "message": "This is an automated E2E test submission.",
+    "submittedAt": "2026-03-10T22:44:25.056Z"
+  },
+  {
+    "id": "submission_1773181279982",
+    "name": "Minimal User",
+    "email": "minimal@example.com",
+    "phone": "",
+    "company": "",
+    "service": "",
+    "message": "Minimal test with no optional fields.",
+    "submittedAt": "2026-03-10T22:21:19.982Z"
+  },
+  {
+    "id": "submission_1773181279423",
+    "name": "Test User",
+    "email": "test@example.com",
+    "phone": "+1234567890",
+    "company": "Test Corp",
+    "service": "Cleaning",
+    "message": "This is a test message from automated testing.",
+    "submittedAt": "2026-03-10T22:21:19.423Z"
+  }
+]

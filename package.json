@@ -6,11 +6,18 @@
     "build": "next build",
     "dev": "next dev -p 5000 -H 0.0.0.0",
     "lint": "eslint .",
-    "start": "next start -p 5000 -H 0.0.0.0"
+    "start": "next start -p 5000 -H 0.0.0.0",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:api": "vitest run tests/api",
+    "test:unit": "vitest run tests/unit",
+    "test:all": "vitest run && playwright test"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "latest",
     "@hookform/resolvers": "^3.10.0",
+    "@playwright/test": "^1.58.2",
     "@radix-ui/react-accordion": "latest",
     "@radix-ui/react-alert-dialog": "latest",
     "@radix-ui/react-aspect-ratio": "latest",
@@ -54,6 +61,7 @@
     "next": "^16.1.6",
     "next-themes": "latest",
     "nodemailer": "^8.0.1",
+    "playwright": "^1.58.2",
     "react": "19.2.0",
     "react-day-picker": "latest",
     "react-dom": "19.2.0",
@@ -66,6 +74,7 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "latest",
+    "vitest": "^4.0.18",
     "zod": "3.25.76"
   },
   "devDependencies": {
