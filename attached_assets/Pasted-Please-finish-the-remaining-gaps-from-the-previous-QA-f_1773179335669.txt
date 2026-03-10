@@ -1,0 +1,162 @@
+Please finish the remaining gaps from the previous QA fix pass. Do NOT redo already completed items. Only address the issues below carefully and keep backward compatibility with existing saved content.
+
+Remaining issues to fix:
+
+1) HP-001 still incomplete — homepage section subtitles are not fully wired to frontend
+Current problem:
+- Subtitle fields were added to the content model and admin editor
+- But several homepage sections still ignore CMS subtitles and continue using hardcoded translation text
+
+Please update these components so they read subtitle from CMS first, and only fall back to translations if the CMS subtitle is missing/empty:
+- `components/kpis.tsx`
+- `components/testimonials.tsx`
+- `components/why-choose-us.tsx`
+- `components/services-video-section.tsx`
+- `components/home-news-section.tsx`
+
+Implementation rule:
+- Use the matching `homepageSections[sectionKey][locale].subtitle` value
+- If subtitle is blank or undefined, fallback to existing translation text
+- Keep current design unchanged
+
+2) HP-005 still needs hardening — upload output metadata must match actual processed file
+Current problem:
+- Upload handling is improved, but filename/type handling is still not fully aligned with the actual output format
+
+Please fix `app/api/upload/route.ts` so that:
+- the final saved filename extension matches the actual processed output format
+- the returned MIME type matches the actual processed output format
+- GIF files are preserved safely without accidental conversion
+- JPEG/PNG/WebP outputs are consistent and explicit
+
+Implementation requirements:
+- compute the final output format first
+- generate filename from final output format, not original extension
+- return the correct `type` for the final processed asset
+- keep existing upload response shape compatible where possible
+
+3) HP-013 still incomplete — map config needs safe fallback
+Current problem:
+- `mapEmbedUrl` was added and admin can edit it
+- but older content may have no `mapEmbedUrl`, which can cause the map to disappear entirely
+
+Please fix this by:
+- adding a safe default `mapEmbedUrl` in default content
+- ensuring old saved content without `mapEmbedUrl` still renders a fallback map
+- keeping admin editability intact
+
+Files likely involved:
+- `lib/content-context.tsx`
+- `app/contact/page.tsx`
+
+Behavior required:
+- if `content.contact.mapEmbedUrl` exists, use it
+- otherwise use the same legacy/default embed URL instead of hiding the map
+
+4) HP-014 is NOT properly fixed — replace client-side SEO mutation with real Next.js metadata
+Current problem:
+- `components/seo-metadata.tsx` is still mutating document title/meta tags on the client
+- this is not proper crawler/server SEO
+- service pages and custom pages are not using true server-rendered metadata
+
+Please implement proper Next.js metadata using `generateMetadata()` and server-side content loading.
+
+Required scope:
+- static pages with CMS SEO
+- service detail pages
+- custom pages
+- global defaults + per-page overrides
+- title, description, canonical, Open Graph, Twitter metadata
+- fallback behavior when some SEO fields are missing
+
+Implementation requirements:
+- stop relying on client-side `useEffect` meta mutation for primary SEO
+- create reusable metadata helper(s) in `lib` if needed
+- use server-side content loading for metadata generation
+- wire service SEO from service content
+- wire custom page SEO from custom page content
+- preserve current admin SEO editing model as the data source
+
+Expected files likely involved:
+- `app/layout.tsx`
+- relevant page files under `app/`
+- service page route
+- custom page route
+- `lib/server-content.ts` or equivalent
+- metadata helper utilities in `lib`
+
+Important:
+- It is okay to keep a lightweight client helper only for non-critical browser-side updates, but real SEO must come from Next metadata APIs
+
+5) HP-015 partially implemented but not aligned with requested architecture
+Current problem:
+- custom pages currently render under `/p/[slug]`
+- requested behavior was clean public page URLs
+- reserved slug protection is incomplete
+- custom page SEO is still tied to unfinished SEO implementation
+
+Please upgrade the custom pages feature so it matches the requested behavior more closely.
+
+Required changes:
+- move custom public page rendering from `/p/[slug]` to clean route handling like `app/[slug]/page.tsx`
+- ensure built-in routes still take precedence and continue working
+- only render a custom page when slug matches a published custom page
+- otherwise return `notFound()`
+
+Slug validation requirements:
+- normalize slug to lowercase
+- trim whitespace
+- remove leading/trailing slashes
+- prevent duplicates
+- block reserved slugs including at least:
+  - `admin`
+  - `api`
+  - `about`
+  - `contact`
+  - `services`
+  - `projects`
+  - `careers`
+  - `news`
+  - `login`
+  - `forgot-password`
+  - empty slug
+
+Navbar requirements:
+- if custom page is published and `showInNavbar` is true, include it in navbar
+- navbar links should point to `/${slug}` not `/p/${slug}`
+- use localized page title
+
+Compatibility requirement:
+- if you need to preserve old `/p/[slug]` links temporarily, add a redirect instead of maintaining two separate rendering systems
+
+SEO requirement:
+- custom pages must participate in the proper `generateMetadata()` system
+
+6) Missing API route still broken — SMTP diagnostic endpoint
+Current problem:
+- `app/admin/smtp-check/page.tsx` calls `/api/auth/smtp-diagnostic`
+- that route is still missing
+
+Please do one of these cleanly:
+Option A:
+- implement `app/api/auth/smtp-diagnostic/route.ts` so the SMTP check page works
+
+Option B:
+- if SMTP diagnostics are intentionally unsupported, remove/disable the admin SMTP diagnostic page and any calls to that endpoint so there is no broken UI
+
+Do not leave a page in the admin that calls a missing API route.
+
+General requirements:
+- Do not break already-fixed items
+- Keep TypeScript-safe code
+- Preserve existing admin UI style
+- Maintain backward compatibility with old `content.json`
+- Add safe defaults where new fields may be missing
+- Avoid duplicate logic where possible
+
+After making changes, give a concise implementation summary with:
+1. files changed
+2. what each remaining issue was fixed with
+3. any migration/fallback logic added
+4. whether `/p/[slug]` was replaced or redirected
+5. how SEO metadata is now generated

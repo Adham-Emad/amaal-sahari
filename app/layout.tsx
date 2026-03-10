@@ -5,32 +5,14 @@ import { LocaleProvider } from "@/lib/locale-context"
 import { ContentProvider } from "@/lib/content-context"
 import WhatsAppWidget from "@/components/whatsapp-widget"
 import SEOMetadata from "@/components/seo-metadata"
+import { getGlobalMetadata } from "@/lib/metadata"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 const cairo = Cairo({ subsets: ["arabic"], variable: "--font-arabic" })
 
-export const metadata: Metadata = {
-  title: "Amaal Sahari - Integrated Facility Management Solutions",
-  description:
-    "Comprehensive facility management services providing integrated workplace solutions that enhance productivity and comfort",
-  keywords: "facility management, cleaning services, security, workplace solutions",
-  generator: "v0.app",
-  robots: "index, follow",
-  authors: [{ name: "Amaal Sahari" }],
-  openGraph: {
-    title: "Amaal Sahari - Integrated Facility Management Solutions",
-    description: "Comprehensive facility management services providing integrated workplace solutions",
-    type: "website",
-    locale: "en_US",
-    alternateLocale: ["ar_SA"],
-    siteName: "Amaal Sahari",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Amaal Sahari - Integrated Facility Management Solutions",
-    description: "Comprehensive facility management services providing integrated workplace solutions",
-  },
+export function generateMetadata(): Metadata {
+  return getGlobalMetadata()
 }
 
 export default function RootLayout({
@@ -52,7 +34,6 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Amaal%20Sahari%20Web%20Logo-JeTkcT88yuJW3ZTgu8RnID1sBhHFbs.png" />
         <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
         <script dangerouslySetInnerHTML={{ __html: `try{var l=localStorage.getItem("locale");if(l==="ar"){document.documentElement.lang="ar";document.documentElement.dir="rtl";document.documentElement.setAttribute("data-locale","ar")}}catch(e){}` }} />
-        {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

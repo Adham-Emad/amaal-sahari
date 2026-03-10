@@ -15,7 +15,8 @@ type CustomPage = NonNullable<SiteContent["customPages"]>[number]
 
 const RESERVED_SLUGS = [
   "about", "admin", "api", "blog", "careers", "case-studies",
-  "contact", "faqs", "news", "privacy", "services", "terms"
+  "contact", "faqs", "forgot-password", "login", "news",
+  "p", "privacy", "projects", "services", "terms",
 ]
 
 function generateSlug(title: string): string {

@@ -16,10 +16,13 @@ export default function ServicesVideoSection() {
   const isArabic = locale === "ar"
   const { ref, inView } = useInView({ threshold: 0.3, triggerOnce: true })
 
-  // Get section title from CMS
   const sectionTitle = isArabic
     ? content?.homepageSections?.servicesVideo?.ar?.title || "خدمات ناعمة احترافية لأماكن العمل الحديثة"
     : content?.homepageSections?.servicesVideo?.en?.title || "Professional Soft Services for Modern Workplaces"
+
+  const sectionSubtitle = isArabic
+    ? content?.homepageSections?.servicesVideo?.ar?.subtitle || t.hero.subtitle
+    : content?.homepageSections?.servicesVideo?.en?.subtitle || t.hero.subtitle
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -67,7 +70,7 @@ export default function ServicesVideoSection() {
         </motion.h1>
 
         <motion.p variants={itemVariants} className="text-lg md:text-xl text-background/95 mb-8 max-w-2xl mx-auto">
-          {t.hero.subtitle}
+          {sectionSubtitle}
         </motion.p>
 
         <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center">

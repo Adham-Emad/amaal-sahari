@@ -808,6 +808,7 @@ const defaultContent: SiteContent = {
         ar: { city: "الشارقة", address: "منطقة الصناعية، الشار��ة" },
       },
     ],
+    mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3610.7319255325446!2d55.27461!3d25.2048!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f43348c5555ab%3A0x12345678!2sDubai%2C%20UAE!5e0!3m2!1sen!2s!4v1234567890",
   },
   footer: {
     stats: [
@@ -1005,6 +1006,28 @@ const loadFromIndexedDB = async (): Promise<SiteContent | null> => {
   }
 }
 
+function deepMergeContent(defaults: SiteContent, saved: Partial<SiteContent>): SiteContent {
+  const merged = { ...defaults } as any
+  for (const key of Object.keys(saved) as Array<keyof SiteContent>) {
+    const savedVal = (saved as any)[key]
+    const defaultVal = (defaults as any)[key]
+    if (
+      savedVal !== null &&
+      savedVal !== undefined &&
+      typeof savedVal === 'object' &&
+      !Array.isArray(savedVal) &&
+      typeof defaultVal === 'object' &&
+      !Array.isArray(defaultVal) &&
+      defaultVal !== null
+    ) {
+      merged[key] = { ...defaultVal, ...savedVal }
+    } else if (savedVal !== undefined) {
+      merged[key] = savedVal
+    }
+  }
+  return merged as SiteContent
+}
+
 export function ContentProvider({ children }: { children: React.ReactNode }) {
   const [content, setContent] = useState<SiteContent>(defaultContent)
   const [isContentLoaded, setIsContentLoaded] = useState(false)
@@ -1028,7 +1051,7 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
         if (response.ok) {
           const result = await response.json()
           if (result.success && result.data) {
-            setContent({ ...defaultContent, ...result.data })
+            setContent(deepMergeContent(defaultContent, result.data))
             console.log('[v0] Content loaded from SERVER (all users see same data)')
             contentLoaded = true
             return
@@ -1045,7 +1068,7 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
       try {
         const savedFromIndexedDB = await loadFromIndexedDB()
         if (savedFromIndexedDB) {
-          setContent({ ...defaultContent, ...savedFromIndexedDB })
+          setContent(deepMergeContent(defaultContent, savedFromIndexedDB))
           console.log('[v0] Content loaded from IndexedDB (server unavailable)')
           return
         }
@@ -1058,7 +1081,7 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
         const saved = localStorage.getItem(STORAGE_KEY)
         if (saved) {
           const parsed = JSON.parse(saved)
-          setContent({ ...defaultContent, ...parsed })
+          setContent(deepMergeContent(defaultContent, parsed))
           console.log('[v0] Content loaded from localStorage (server unavailable)')
           return
         }
@@ -1077,7 +1100,7 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
       if (e.key === STORAGE_KEY && e.newValue) {
         try {
           const parsed = JSON.parse(e.newValue)
-          setContent({ ...defaultContent, ...parsed })
+          setContent(deepMergeContent(defaultContent, parsed))
           console.log('[v0] Content updated from storage event')
         } catch (error) {
           console.error('[v0] Failed to parse storage update:', error)

@@ -12,10 +12,13 @@ export default function HomeNewsSection() {
   const { content } = useContent()
   const isArabic = locale === "ar"
 
-  // Get section title from CMS
   const sectionTitle = isArabic
     ? content?.homepageSections?.news?.ar?.title || "أخبار أمال الصحاري"
     : content?.homepageSections?.news?.en?.title || "Latest News"
+
+  const sectionSubtitle = isArabic
+    ? content?.homepageSections?.news?.ar?.subtitle || "ابقَ على اطلاع بآخر أخبار وتحديثات أمال الصحاري"
+    : content?.homepageSections?.news?.en?.subtitle || "Stay updated with the latest news and updates from Amaal Sahari"
 
   // Get the latest 3 news items
   const latestNews = content.news.items.slice(0, 3)
@@ -42,9 +45,7 @@ export default function HomeNewsSection() {
           </h2>
         </div>
         <p className="text-[#666666] text-lg mb-12 max-w-2xl">
-          {isArabic
-            ? "ابقَ على اطلاع بآخر أخبار وتحديثات أمال الصحاري"
-            : "Stay updated with the latest news and updates from Amaal Sahari"}
+          {sectionSubtitle}
         </p>
 
         {/* News Grid */}

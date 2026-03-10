@@ -13,10 +13,13 @@ export default function WhyChooseUs() {
   const { content } = useContent()
   const isArabic = locale === "ar"
 
-  // Get section title from CMS
   const sectionTitle = isArabic
     ? content?.homepageSections?.whyChooseUs?.ar?.title || t.title
     : content?.homepageSections?.whyChooseUs?.en?.title || t.title
+
+  const sectionSubtitle = isArabic
+    ? content?.homepageSections?.whyChooseUs?.ar?.subtitle || t.subtitle
+    : content?.homepageSections?.whyChooseUs?.en?.subtitle || t.subtitle
 
   const items = content.whyChooseUs.items.map((item) => ({
     title: item[locale].title,
@@ -45,7 +48,8 @@ export default function WhyChooseUs() {
 
           <div>
             <ScrollFade>
-              <h2 className="text-4xl md:text-5xl font-bold text-[#2F683E] mb-8">{sectionTitle}</h2>
+              <h2 className="text-4xl md:text-5xl font-bold text-[#2F683E] mb-4">{sectionTitle}</h2>
+              {sectionSubtitle && <p className="text-xl text-[#2F683E]/70 mb-8">{sectionSubtitle}</p>}
             </ScrollFade>
 
             <div className="grid grid-cols-1 gap-6">

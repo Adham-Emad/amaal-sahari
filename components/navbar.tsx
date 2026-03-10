@@ -29,7 +29,7 @@ export default function Navbar() {
   const customPageItems = (content.customPages || [])
     .filter((p) => p.showInNavbar && p.status === "published")
     .sort((a, b) => (a.navbarOrder || 0) - (b.navbarOrder || 0))
-    .map((p) => ({ label: p[locale].title, href: `/p/${p.slug}`, anchor: undefined }))
+    .map((p) => ({ label: p[locale].title, href: `/${p.slug}`, anchor: undefined }))
 
   const navItems = [...cmsNavItems, ...customPageItems]
 

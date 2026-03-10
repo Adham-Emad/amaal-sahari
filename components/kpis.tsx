@@ -18,16 +18,20 @@ export default function KPIs() {
     label: kpi[locale as "en" | "ar"]?.label || "",
   }))
 
-  // Get section title from CMS
   const sectionTitle = isArabic
     ? content?.homepageSections?.kpis?.ar?.title || t.title
     : content?.homepageSections?.kpis?.en?.title || t.title
+
+  const sectionSubtitle = isArabic
+    ? content?.homepageSections?.kpis?.ar?.subtitle || t.subtitle
+    : content?.homepageSections?.kpis?.en?.subtitle || t.subtitle
 
   return (
     <section className="py-16 md:py-24 bg-[#2F683E]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollFade>
-          <h2 className="text-4xl md:text-5xl font-bold mb-12 text-center text-white">{sectionTitle}</h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-center text-white">{sectionTitle}</h2>
+          {sectionSubtitle && <p className="text-xl text-white/80 text-center mb-12 max-w-2xl mx-auto">{sectionSubtitle}</p>}
         </ScrollFade>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">

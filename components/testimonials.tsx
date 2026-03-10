@@ -13,12 +13,14 @@ export default function Testimonials() {
   const { content } = useContent()
   const isArabic = locale === "ar"
 
-  // Get section title from CMS
   const sectionTitle = isArabic
     ? content?.homepageSections?.testimonials?.ar?.title || t.title
     : content?.homepageSections?.testimonials?.en?.title || t.title
 
-  // Use content from context for dynamic testimonials
+  const sectionSubtitle = isArabic
+    ? content?.homepageSections?.testimonials?.ar?.subtitle || t.subtitle
+    : content?.homepageSections?.testimonials?.en?.subtitle || t.subtitle
+
   const testimonialItems = content.testimonials.items.map((item) => ({
     quote: item[locale].quote,
     author: item[locale].author,
@@ -31,7 +33,8 @@ export default function Testimonials() {
     <section className="py-16 md:py-24 bg-[#FAFBF0]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollFade>
-          <h2 className="text-4xl md:text-5xl font-bold text-[#2F683E] mb-12 text-center">{sectionTitle}</h2>
+          <h2 className="text-4xl md:text-5xl font-bold text-[#2F683E] mb-4 text-center">{sectionTitle}</h2>
+          {sectionSubtitle && <p className="text-xl text-[#2F683E]/70 text-center mb-12 max-w-2xl mx-auto">{sectionSubtitle}</p>}
         </ScrollFade>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

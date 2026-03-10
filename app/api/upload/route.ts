@@ -5,10 +5,8 @@ import path from 'path'
 import crypto from 'crypto'
 import { requireAuth } from '@/lib/auth'
 
-// Increase timeout for large file uploads
-export const maxDuration = 120 // 120 seconds for upload + processing
+export const maxDuration = 120
 
-// Directory for storing uploaded files (NOT in JSON)
 const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads')
 const TEMP_UPLOADS_DIR = path.join(process.cwd(), 'data', 'temp-uploads')
 
@@ -25,11 +23,31 @@ function ensureUploadsDir() {
   }
 }
 
-// Generate unique filename to avoid collisions
-function generateFilename(originalName: string, fileType: string): string {
+const FORMAT_TO_EXT: Record<string, string> = {
+  jpeg: 'jpg',
+  png: 'png',
+  webp: 'webp',
+  gif: 'gif',
+}
+
+const FORMAT_TO_MIME: Record<string, string> = {
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
+  gif: 'image/gif',
+}
+
+const MIME_TO_FORMAT: Record<string, string> = {
+  'image/jpeg': 'jpeg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/gif': 'gif',
+}
+
+function generateFilename(outputFormat: string): string {
   const timestamp = Date.now()
   const random = crypto.randomBytes(4).toString('hex')
-  const ext = originalName.split('.').pop() || (fileType === 'image/jpeg' ? 'jpg' : 'png')
+  const ext = FORMAT_TO_EXT[outputFormat] || 'png'
   return `${timestamp}-${random}.${ext}`
 }
 
@@ -54,7 +72,6 @@ export async function POST(request: NextRequest) {
 
     console.log('[v0] Processing file:', file.name, 'Type:', file.type, 'Size:', (file.size / 1024).toFixed(1), 'KB')
 
-    // Validate file type
     const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
     const allowedVideoTypes = ['video/mp4', 'video/webm']
     const isImage = allowedImageTypes.includes(file.type)
@@ -68,9 +85,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate file size
-    const maxImageSize = 5 * 1024 * 1024 // 5MB for images
-    const maxVideoSize = 50 * 1024 * 1024 // 50MB for videos
+    const maxImageSize = 5 * 1024 * 1024
+    const maxVideoSize = 50 * 1024 * 1024
     const maxSize = isVideo ? maxVideoSize : maxImageSize
 
     if (file.size > maxSize) {
@@ -85,18 +101,13 @@ export async function POST(request: NextRequest) {
     try {
       const buffer = await file.arrayBuffer()
       let processedBuffer = Buffer.from(buffer)
-      const filename = generateFilename(file.name, file.type)
-      const filepath = path.join(UPLOADS_DIR, filename)
 
-      if (isImage && file.type !== 'image/gif') {
-        console.log('[v0] Processing image...')
+      const outputFormat = MIME_TO_FORMAT[file.type] || 'png'
+      const isGif = file.type === 'image/gif'
+
+      if (isImage && !isGif) {
+        console.log('[v0] Processing image as', outputFormat)
         try {
-          const formatMap: Record<string, string> = {
-            'image/jpeg': 'jpeg',
-            'image/png': 'png',
-            'image/webp': 'webp',
-          }
-          const outputFormat = formatMap[file.type] || 'png'
           processedBuffer = await sharp(processedBuffer)
             .rotate()
             .resize(2000, 2000, {
@@ -110,29 +121,37 @@ export async function POST(request: NextRequest) {
         } catch (compressErr) {
           console.warn('[v0] Image processing failed, using original:', compressErr)
           processedBuffer = Buffer.from(buffer)
+          return NextResponse.json({
+            url: `/uploads/${generateFilename(outputFormat)}`,
+            error: 'Image processing failed. Please try a different image.',
+          }, { status: 500 })
         }
-      } else if (file.type === 'image/gif') {
+      } else if (isGif) {
         console.log('[v0] GIF detected, saving without processing')
       }
 
-      // Write file to disk instead of base64
+      const videoExtMap: Record<string, string> = { 'video/mp4': 'mp4', 'video/webm': 'webm' }
+      const filename = isVideo
+        ? `${Date.now()}-${crypto.randomBytes(4).toString('hex')}.${videoExtMap[file.type] || 'mp4'}`
+        : generateFilename(outputFormat)
+      const filepath = path.join(UPLOADS_DIR, filename)
+
       fs.writeFileSync(filepath, processedBuffer)
       
-      // Verify write
       const stat = fs.statSync(filepath)
       console.log('[v0] File saved to disk:', filename, 'Size:', (stat.size / 1024).toFixed(1), 'KB')
 
-      // Return URL path instead of base64
       const urlPath = `/uploads/${filename}`
+      const finalMime = isVideo ? file.type : (FORMAT_TO_MIME[outputFormat] || file.type)
 
       return NextResponse.json({
-        url: urlPath, // Return file path instead of base64
+        url: urlPath,
         filename: filename,
         originalName: file.name,
         size: file.size,
         processedSize: processedBuffer.length,
-        type: file.type,
-        isFile: true, // Flag to indicate this is a file URL, not base64
+        type: finalMime,
+        isFile: true,
       })
     } catch (conversionError) {
       console.error('[v0] File save failed:', conversionError)
