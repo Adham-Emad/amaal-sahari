@@ -88,18 +88,22 @@ export async function POST(request: NextRequest) {
       const filename = generateFilename(file.name, file.type)
       const filepath = path.join(UPLOADS_DIR, filename)
 
-      // For images, optimize by compressing
-      if (isImage) {
+      if (isImage && file.type !== 'image/gif') {
         console.log('[v0] Processing image...')
         try {
-          // Always compress to save space
+          const formatMap: Record<string, string> = {
+            'image/jpeg': 'jpeg',
+            'image/png': 'png',
+            'image/webp': 'webp',
+          }
+          const outputFormat = formatMap[file.type] || 'png'
           processedBuffer = await sharp(processedBuffer)
-            .rotate() // Auto-rotate based on EXIF
+            .rotate()
             .resize(2000, 2000, {
               fit: 'inside',
               withoutEnlargement: true
             })
-            .toFormat(file.type === 'image/jpeg' ? 'jpeg' : 'png', { quality: 85 })
+            .toFormat(outputFormat as keyof sharp.FormatEnum, { quality: 85 })
             .toBuffer()
           
           console.log('[v0] Image processed:', (processedBuffer.length / 1024).toFixed(1), 'KB')
@@ -107,6 +111,8 @@ export async function POST(request: NextRequest) {
           console.warn('[v0] Image processing failed, using original:', compressErr)
           processedBuffer = Buffer.from(buffer)
         }
+      } else if (file.type === 'image/gif') {
+        console.log('[v0] GIF detected, saving without processing')
       }
 
       // Write file to disk instead of base64

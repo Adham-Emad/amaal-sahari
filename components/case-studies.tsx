@@ -40,7 +40,7 @@ export default function CaseStudies() {
         <ScrollFade>
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold text-[#2F683E] mb-4">{sectionTitle}</h2>
-            <p className="text-xl text-black">{t.subtitle}</p>
+            <p className="text-xl text-black">{isArabic ? (content?.homepageSections?.projects?.ar?.subtitle || t.subtitle) : (content?.homepageSections?.projects?.en?.subtitle || t.subtitle)}</p>
           </div>
         </ScrollFade>
 
@@ -49,9 +49,9 @@ export default function CaseStudies() {
             <ScrollFade key={index} delay={index * 100}>
               <div
                 onClick={() => router.push(`/case-studies/${content.caseStudies.items[index].id}`)}
-                className="bg-white rounded-lg overflow-hidden shadow-sm border border-[#EA8936]/20 hover:shadow-md transition-all hover:border-[#EA8936] group cursor-pointer"
+                className="bg-white rounded-lg overflow-hidden shadow-sm border border-[#EA8936]/20 hover:shadow-md transition-all hover:border-[#EA8936] group cursor-pointer h-full flex flex-col"
               >
-                <div className="relative h-48 w-full overflow-hidden bg-gradient-to-br from-[#EA8936]/10 to-[#3EB249]/10">
+                <div className="relative h-48 w-full overflow-hidden bg-gradient-to-br from-[#EA8936]/10 to-[#3EB249]/10 flex-shrink-0">
                   {study.imageUrl && !study.imageUrl.includes("placeholder") ? (
                     <Image
                       src={study.imageUrl}
@@ -66,13 +66,13 @@ export default function CaseStudies() {
                     </div>
                   )}
                 </div>
-                <div className="p-8 text-center">
-                  <div className="flex items-center gap-3 mb-4 justify-center">
-                    <TrendingUp className="w-6 h-6 text-[#EA8936] group-hover:scale-110 transition-transform" />
-                    <span className="text-sm font-semibold text-[#EA8936]">{study.metrics}</span>
+                <div className="p-8 text-center flex flex-col flex-1">
+                  <div className="flex items-center gap-3 mb-4 justify-center flex-shrink-0">
+                    <TrendingUp className="w-6 h-6 text-[#EA8936] group-hover:scale-110 transition-transform flex-shrink-0" />
+                    <span className="text-sm font-semibold text-[#EA8936] line-clamp-1">{study.metrics}</span>
                   </div>
-                  <h3 className="text-xl font-semibold text-[#2F683E] mb-3">{study.title}</h3>
-                  <p className="text-black">{study.description}</p>
+                  <h3 className="text-xl font-semibold text-[#2F683E] mb-3 line-clamp-2">{study.title}</h3>
+                  <p className="text-black line-clamp-3 flex-1">{study.description}</p>
                 </div>
               </div>
             </ScrollFade>

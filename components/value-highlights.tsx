@@ -30,7 +30,7 @@ export default function ValueHighlights() {
         <ScrollFade>
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold text-[#2F683E] mb-4">{sectionTitle}</h2>
-            <p className="text-xl text-[#2F683E]/70 max-w-2xl mx-auto">{t.subtitle}</p>
+            <p className="text-xl text-[#2F683E]/70 max-w-2xl mx-auto">{isArabic ? (content?.homepageSections?.valueHighlights?.ar?.subtitle || t.subtitle) : (content?.homepageSections?.valueHighlights?.en?.subtitle || t.subtitle)}</p>
           </div>
         </ScrollFade>
 

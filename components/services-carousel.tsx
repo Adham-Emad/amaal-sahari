@@ -15,7 +15,7 @@ export default function ServicesCarousel() {
   const { content } = useContent()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isAutoPlay, setIsAutoPlay] = useState(true)
-  const autoPlayRef = useRef<NodeJS.Timeout>()
+  const autoPlayRef = useRef<NodeJS.Timeout>(null)
   const isArabic = locale === "ar"
 
   const services = content.services.items
@@ -33,7 +33,7 @@ export default function ServicesCarousel() {
               {locale === "ar" ? "خدماتنا" : "OUR SERVICES"}
             </p>
             <h2 className="text-4xl md:text-5xl font-bold text-[#2F683E] mb-4">{sectionTitle}</h2>
-            <p className="text-xl text-black max-w-2xl mx-auto">{t.subtitle}</p>
+            <p className="text-xl text-black max-w-2xl mx-auto">{isArabic ? (content?.homepageSections?.services?.ar?.subtitle || t.subtitle) : (content?.homepageSections?.services?.en?.subtitle || t.subtitle)}</p>
           </div>
           <div className="text-center text-gray-500">
             {locale === "ar" ? "لا توجد خدمات متاحة حالياً" : "No services available at the moment"}
@@ -87,7 +87,7 @@ const handlePrev = () => {
               {locale === "ar" ? "خدماتنا" : "OUR SERVICES"}
             </p>
             <h2 className="text-4xl md:text-5xl font-bold text-[#2F683E] mb-4">{sectionTitle}</h2>
-            <p className="text-xl text-black max-w-2xl mx-auto">{t.subtitle}</p>
+            <p className="text-xl text-black max-w-2xl mx-auto">{isArabic ? (content?.homepageSections?.services?.ar?.subtitle || t.subtitle) : (content?.homepageSections?.services?.en?.subtitle || t.subtitle)}</p>
           </div>
         </ScrollFade>
 

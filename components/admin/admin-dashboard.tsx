@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import {
@@ -19,22 +18,9 @@ import {
   Search,
   MessageCircle,
   Share2,
-  Menu,
-  RotateCcw,
-  Lock
+  Menu
 } from "lucide-react"
 import ChangePasswordDialog from "./change-password-dialog"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
 import HeroEditor from "./editors/hero-editor"
 import KpisEditor from "./editors/kpis-editor"
 import TestimonialsEditor from "./editors/testimonials-editor"
@@ -63,10 +49,9 @@ import ContactSubmissionsEditor from "./editors/contact-submissions-editor"
 import JobApplicationsEditor from "./editors/job-applications-editor"
 import BlogDetailsEditor from "./editors/blog-details-editor"
 import CaseStudyDetailsEditor from "./editors/case-study-details-editor"
-import { useContent } from "@/lib/content-context"
+import CustomPagesEditor from "./editors/custom-pages-editor"
 
 export default function AdminDashboard() {
-  const { resetToDefault } = useContent()
   const [activeTab, setActiveTab] = useState("hero")
 
   return (
@@ -74,29 +59,6 @@ export default function AdminDashboard() {
       {/* Admin Controls - Inside Admin Dashboard Only */}
       <div className="border-b bg-background px-4 py-3 flex justify-end gap-2">
         <ChangePasswordDialog />
-        
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="outline" size="sm" className="text-destructive hover:text-destructive">
-              <RotateCcw className="w-4 h-4 mr-2" />
-              Reset All Content
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Reset all content?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This will reset all content to default values. This action cannot be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={resetToDefault} className="bg-destructive">
-                Reset
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
 
       {/* Main Content */}
@@ -216,6 +178,10 @@ export default function AdminDashboard() {
         <Briefcase className="w-4 h-4" />
         <span className="hidden sm:inline">Case Studies Details</span>
       </TabsTrigger>
+      <TabsTrigger value="custom-pages" className="flex items-center gap-2">
+        <FileText className="w-4 h-4" />
+        <span className="hidden sm:inline">Custom Pages</span>
+      </TabsTrigger>
     </TabsList>
     <ScrollBar orientation="horizontal" />
   </ScrollArea>
@@ -330,6 +296,10 @@ export default function AdminDashboard() {
 
   <TabsContent value="case-studies-details" className="space-y-4">
     <CaseStudyDetailsEditor />
+  </TabsContent>
+
+  <TabsContent value="custom-pages" className="space-y-4">
+    <CustomPagesEditor />
   </TabsContent>
 </Tabs>
       </main>

@@ -1,0 +1,178 @@
+Please fix the following QA issues in my Next.js project. Make the changes directly in the existing architecture without breaking current content data. Keep backward compatibility with existing saved `content.json` where possible.
+
+Issues to fix:
+
+1) HP-001: Home page section subtitles are not editable from admin
+- Extend the `homepageSections` content model in `lib/content-context.tsx` so each section supports:
+  - `visible`
+  - `en.title`
+  - `en.subtitle`
+  - `ar.title`
+  - `ar.subtitle`
+- Update default content accordingly
+- Update `components/admin/editors/homepage-sections-editor.tsx` to allow editing subtitles for all homepage sections
+- Update frontend home section components to use CMS subtitle values first, with translation fallback only if subtitle is missing
+- Check at least:
+  - `components/services-carousel.tsx`
+  - `components/case-studies.tsx`
+  - any other homepage section component using hardcoded translation subtitles
+
+2) HP-003: Remove Reset All Content button
+- Remove the entire Reset All Content button and confirmation dialog from `components/admin/admin-dashboard.tsx`
+- Do not show this action in production admin UI
+
+3) HP-004: Navbar link names edited in admin do not reflect on frontend
+- In `components/navbar.tsx`, stop using hardcoded translation nav labels
+- Use `content.navbar.navigation[locale]` as the source of truth
+- Preserve existing navigation behavior for anchor links such as services/projects
+- If needed, extend nav item structure to support `anchor`
+- Make sure admin navbar edits update the frontend correctly
+
+4) HP-005: Cannot add images to Service Details page
+- Fix `app/api/upload/route.ts` so uploaded image output format matches the saved filename extension and returned MIME type
+- Do not convert images to PNG while keeping original `.webp`/`.gif`/etc extension
+- If converting, rename extension correctly
+- Preserve or explicitly handle GIF behavior safely
+- Verify `components/admin/file-upload.tsx` previews still work after upload
+
+5) HP-006: Call Now and WhatsApp buttons on Service Details page do not work
+- In `app/services/[slug]/page.tsx`, wire buttons to:
+  - call: `tel:${content.contact.phone}`
+  - WhatsApp: `https://wa.me/${digitsOnly(content.contact.whatsapp)}`
+- Prefer `Button asChild` or accessible anchor/button patterns
+- Optionally use `content.whatsapp.prefilledMessage` for WhatsApp text
+
+6) HP-008: Service page sometimes shows “Service Not Found” on refresh
+- Add loading state support in content context, e.g. `isContentLoaded`
+- In `app/services/[slug]/page.tsx`, show loading/skeleton until content has finished loading
+- Only show “Service Not Found” after content load is complete and no matching service exists
+
+7) HP-009: Case Studies cards break with long text
+- In `components/case-studies.tsx`, make cards layout-stable
+- Use consistent card heights and flex layout
+- Clamp long text:
+  - title line clamp
+  - description line clamp
+  - metrics truncation/clamp
+- Keep visual design close to current version
+
+8) HP-011: Make “Our Services” home section easier to control from admin
+- In `components/admin/editors/homepage-sections-editor.tsx`, improve labels/help text so it is obvious this controls the home section heading/subtitle/visibility
+- Clarify relationship with:
+  - `ServicesEditor` for service cards
+  - `ServiceDetailsEditor` for detail page content
+
+9) HP-012: Contact page “Our Locations in UAE” is not editable in admin
+- In `components/admin/editors/contact-editor.tsx`, make Locations tab fully editable
+- Support:
+  - edit city/address in EN/AR
+  - edit phone
+  - edit email
+  - add location
+  - remove location
+- Persist through existing `updateSection("contact", ...)`
+
+10) HP-013: Map address/coordinates are not configurable
+- Extend `content.contact` model to support map config
+- Preferred quick implementation:
+  - `mapEmbedUrl: string`
+- Add input in `components/admin/editors/contact-editor.tsx`
+- Replace hardcoded iframe `src` in `app/contact/page.tsx` with CMS-driven map embed URL
+- Keep backward compatibility if old content has no map field by falling back to existing default embed
+
+11) HP-014: SEO settings are not properly implemented across frontend
+- Replace the current client-side SEO mutation approach in `components/seo-metadata.tsx` with proper Next.js metadata implementation
+- Use `generateMetadata()` where appropriate
+- Support:
+  - global SEO defaults
+  - static page SEO overrides
+  - dynamic service page SEO from `service.seo`
+  - dynamic custom page SEO from `customPages`
+- Ensure title, description, canonical, OG, and Twitter metadata are server-rendered
+- Keep the existing admin SEO editors functional by reading from the same content source
+- If a helper is needed, create a reusable metadata utility in `lib`
+
+12) HP-015: Implement Add Page functionality in admin as a custom pages system
+- Build a simple custom pages feature, not a full drag-and-drop page builder
+- Extend the main content model in `lib/content-context.tsx` with:
+  - `customPages: []`
+- Each custom page should support:
+  - `id`
+  - `slug`
+  - `status` (`draft` or `published`)
+  - `showInNavbar` (boolean)
+  - `navbarOrder` (number)
+  - `en.title`
+  - `en.subtitle`
+  - `en.content`
+  - `ar.title`
+  - `ar.subtitle`
+  - `ar.content`
+  - `seo` object
+  - optional `heroImage`
+  - optional `template` with default value
+- Add safe defaults so older saved content without `customPages` still works
+
+Admin implementation:
+- Create a new editor such as `components/admin/editors/custom-pages-editor.tsx`
+- Add it into the admin dashboard/tabs/navigation
+- Support:
+  - list pages
+  - add page
+  - edit page
+  - delete page
+  - draft/publish toggle
+  - show in navbar toggle
+  - navbar ordering
+  - bilingual title/subtitle/content editing
+  - slug editing
+  - SEO editing
+
+Slug and route rules:
+- Normalize slug to lowercase
+- Remove leading/trailing slashes
+- Prevent duplicates
+- Prevent reserved slugs such as:
+  - `admin`
+  - `api`
+  - `about`
+  - `contact`
+  - `services`
+  - `projects`
+  - `careers`
+  - `news`
+  - `login`
+  - `forgot-password`
+- Do not allow a custom page to override any built-in route
+
+Frontend rendering:
+- Create a dynamic route like `app/[slug]/page.tsx`
+- If slug matches a published custom page, render it
+- Otherwise return `notFound()`
+- Keep existing built-in routes working as they are
+
+Rendering/content:
+- Implement a simple content renderer appropriate for the current architecture
+- Preferred approach:
+  - store content as sanitized HTML or structured multiline text
+- Do not allow unsafe script injection
+- Keep the UI style consistent with the existing site
+
+Navbar behavior:
+- If a custom page is published and `showInNavbar` is true, include it in the navbar
+- Respect `navbarOrder`
+- Use localized page title for the nav label
+
+SEO:
+- Custom pages must participate in the proper Next.js metadata system
+- Use custom page SEO fields with fallback to title/description when needed
+
+Implementation requirements:
+- Keep code TypeScript-safe
+- Preserve existing UI style
+- Avoid breaking existing content structure; use safe defaults when new fields are missing
+- After changes, summarize:
+  1. files changed
+  2. what was fixed
+  3. any migration/default-content fallback added
+  4. how custom pages are created and rendered

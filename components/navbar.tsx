@@ -4,7 +4,6 @@ import type React from "react"
 
 import { useState } from "react"
 import { useLocale } from "@/lib/locale-context"
-import { translations } from "@/lib/i18n"
 import { useContent } from "@/lib/content-context"
 import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -16,30 +15,35 @@ export default function Navbar() {
   const { locale, setLocale, dir } = useLocale()
   const { content } = useContent()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const t = translations[locale]
   const navConfig = content.navbar
 
-  const navItems = [
-    { label: t.nav.home, href: "/" },
-    { label: t.nav.about, href: "/about" },
-    { label: t.nav.services, href: "/", anchor: "services" },
-    { label: t.nav.projects, href: "/", anchor: "projects" },
-    { label: t.nav.contact, href: "/contact" },
-  ]
+  const cmsNavItems = (navConfig.navigation?.[locale] || []).map((item) => {
+    const hasHash = item.href.includes("#")
+    if (hasHash) {
+      const [path, anchor] = item.href.split("#")
+      return { label: item.label, href: path || "/", anchor }
+    }
+    return { label: item.label, href: item.href, anchor: undefined }
+  })
+
+  const customPageItems = (content.customPages || [])
+    .filter((p) => p.showInNavbar && p.status === "published")
+    .sort((a, b) => (a.navbarOrder || 0) - (b.navbarOrder || 0))
+    .map((p) => ({ label: p[locale].title, href: `/p/${p.slug}`, anchor: undefined }))
+
+  const navItems = [...cmsNavItems, ...customPageItems]
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string, anchor?: string) => {
     if (anchor) {
       e.preventDefault()
-      // If on home page, scroll to section
-      if (typeof window !== "undefined" && window.location.pathname === "/") {
+      if (typeof window !== "undefined" && window.location.pathname === (href || "/")) {
         const element = document.getElementById(anchor)
         if (element) {
           element.scrollIntoView({ behavior: "smooth" })
           setMobileMenuOpen(false)
         }
       } else {
-        // Navigate to home and scroll to section
-        window.location.href = `/#${anchor}`
+        window.location.href = `${href || "/"}#${anchor}`
       }
     }
   }
@@ -95,7 +99,7 @@ export default function Navbar() {
                 <Link
                   key={item.label}
                   href={item.href}
-                  onClick={(e) => handleNavClick(e, item.href, (item as any).anchor)}
+                  onClick={(e) => handleNavClick(e, item.href, item.anchor)}
                   className="cursor-pointer transition-colors relative group"
                   style={{ color: navConfig.colors.text }}
                 >
@@ -169,7 +173,7 @@ export default function Navbar() {
                 <Link
                   key={item.label}
                   href={item.href}
-                  onClick={(e) => handleNavClick(e, item.href, (item as any).anchor)}
+                  onClick={(e) => handleNavClick(e, item.href, item.anchor)}
                   className="cursor-pointer block px-4 py-2 rounded transition-colors"
                   style={{
                     color: navConfig.colors.text,

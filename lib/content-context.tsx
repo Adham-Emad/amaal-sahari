@@ -121,14 +121,14 @@ export interface SiteContent {
 
   // HOMEPAGE SECTION MANAGEMENT
   homepageSections: {
-    valueHighlights: { visible: boolean; en: { title: string }; ar: { title: string } }
-    servicesVideo: { visible: boolean; en: { title: string }; ar: { title: string } }
-    kpis: { visible: boolean; en: { title: string }; ar: { title: string } }
-    services: { visible: boolean; en: { title: string }; ar: { title: string } }
-    projects: { visible: boolean; en: { title: string }; ar: { title: string } }
-    whyChooseUs: { visible: boolean; en: { title: string }; ar: { title: string } }
-    testimonials: { visible: boolean; en: { title: string }; ar: { title: string } }
-    news: { visible: boolean; en: { title: string }; ar: { title: string } }
+    valueHighlights: { visible: boolean; en: { title: string; subtitle?: string }; ar: { title: string; subtitle?: string } }
+    servicesVideo: { visible: boolean; en: { title: string; subtitle?: string }; ar: { title: string; subtitle?: string } }
+    kpis: { visible: boolean; en: { title: string; subtitle?: string }; ar: { title: string; subtitle?: string } }
+    services: { visible: boolean; en: { title: string; subtitle?: string }; ar: { title: string; subtitle?: string } }
+    projects: { visible: boolean; en: { title: string; subtitle?: string }; ar: { title: string; subtitle?: string } }
+    whyChooseUs: { visible: boolean; en: { title: string; subtitle?: string }; ar: { title: string; subtitle?: string } }
+    testimonials: { visible: boolean; en: { title: string; subtitle?: string }; ar: { title: string; subtitle?: string } }
+    news: { visible: boolean; en: { title: string; subtitle?: string }; ar: { title: string; subtitle?: string } }
   }
 
   // ABOUT PAGE
@@ -217,6 +217,7 @@ export interface SiteContent {
       en: string
       ar: string
     }
+    mapEmbedUrl?: string
     locations: Array<{
       id: string
       phone: string
@@ -225,6 +226,23 @@ export interface SiteContent {
       ar: { city: string; address: string }
     }>
   }
+
+  // CUSTOM PAGES
+  customPages?: Array<{
+    id: string
+    slug: string
+    status: "draft" | "published"
+    showInNavbar: boolean
+    navbarOrder: number
+    en: { title: string; subtitle: string; content: string }
+    ar: { title: string; subtitle: string; content: string }
+    seo?: {
+      en?: { metaTitle?: string; metaDescription?: string; keywords?: string }
+      ar?: { metaTitle?: string; metaDescription?: string; keywords?: string }
+    }
+    heroImage?: string
+    template?: string
+  }>
 
   // FOOTER
   footer: {
@@ -865,43 +883,43 @@ const defaultContent: SiteContent = {
   homepageSections: {
     valueHighlights: {
       visible: true,
-      en: { title: "Our Value Pillars" },
-      ar: { title: "أعمدة قيمتنا" },
+      en: { title: "Our Value Pillars", subtitle: "The foundation of our service excellence" },
+      ar: { title: "أعمدة قيمتنا", subtitle: "أساس تميز خدماتنا" },
     },
     servicesVideo: {
       visible: true,
-      en: { title: "Our Services" },
-      ar: { title: "خدماتنا" },
+      en: { title: "Our Services", subtitle: "Watch how we deliver excellence" },
+      ar: { title: "خدماتنا", subtitle: "شاهد كيف نقدم التميز" },
     },
     kpis: {
       visible: true,
-      en: { title: "By The Numbers" },
-      ar: { title: "من خلال الأرقام" },
+      en: { title: "By The Numbers", subtitle: "Our track record speaks for itself" },
+      ar: { title: "من خلال الأرقام", subtitle: "سجلنا يتحدث عن نفسه" },
     },
     services: {
       visible: true,
-      en: { title: "Our Services" },
-      ar: { title: "خدماتنا" },
+      en: { title: "Our Services", subtitle: "We Provide Integrated Solutions" },
+      ar: { title: "خدماتنا", subtitle: "نقدم حلولاً متكاملة" },
     },
     projects: {
       visible: true,
-      en: { title: "Case Studies & Projects" },
-      ar: { title: "دراسات الحالة والمشاريع" },
+      en: { title: "Case Studies & Projects", subtitle: "Real results from real partnerships" },
+      ar: { title: "دراسات الحالة والمشاريع", subtitle: "نتائج حقيقية من شراكات حقيقية" },
     },
     whyChooseUs: {
       visible: true,
-      en: { title: "Why Choose Our Soft Services" },
-      ar: { title: "لماذا تختار خدماتنا الناعمة" },
+      en: { title: "Why Choose Our Soft Services", subtitle: "Experience the difference with our professional approach" },
+      ar: { title: "لماذا تختار خدماتنا الناعمة", subtitle: "اكتشف الفرق مع نهجنا المهني" },
     },
     testimonials: {
       visible: true,
-      en: { title: "What Our Clients Say" },
-      ar: { title: "ما يقوله عملاؤنا" },
+      en: { title: "What Our Clients Say", subtitle: "Hear from those who trust us" },
+      ar: { title: "ما يقوله عملاؤنا", subtitle: "اسمع ممن يثقون بنا" },
     },
     news: {
       visible: true,
-      en: { title: "Latest News" },
-      ar: { title: "آخر الأخبار" },
+      en: { title: "Latest News", subtitle: "Stay updated with our latest developments" },
+      ar: { title: "آخر الأخبار", subtitle: "ابق على اطلاع بآخر تطوراتنا" },
     },
   },
   animations: {
@@ -911,6 +929,7 @@ const defaultContent: SiteContent = {
 
 interface ContentContextType {
   content: SiteContent
+  isContentLoaded: boolean
   updateContent: (newContent: Partial<SiteContent>) => void
   updateSection: <K extends keyof SiteContent>(section: K, data: SiteContent[K]) => void
   updateContact: (contact: SiteContent["contact"]) => void
@@ -988,9 +1007,9 @@ const loadFromIndexedDB = async (): Promise<SiteContent | null> => {
 
 export function ContentProvider({ children }: { children: React.ReactNode }) {
   const [content, setContent] = useState<SiteContent>(defaultContent)
+  const [isContentLoaded, setIsContentLoaded] = useState(false)
 
   useEffect(() => {
-    // Load content from server (centralized) on mount, with fallbacks
     const loadContent = async () => {
       let contentLoaded = false
 
@@ -1047,12 +1066,11 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
         console.warn('[v0] localStorage load failed:', e)
       }
 
-      // Step 4: Use default content
       console.log('[v0] Using default content (no saved data found)')
       setContent(defaultContent)
     }
 
-    loadContent()
+    loadContent().finally(() => setIsContentLoaded(true))
 
     // Listen for storage changes (from other tabs/windows)
     const handleStorageChange = (e: StorageEvent) => {
@@ -1204,6 +1222,7 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
     <ContentContext.Provider
       value={{
         content,
+        isContentLoaded,
         updateContent,
         updateSection,
         updateContact,

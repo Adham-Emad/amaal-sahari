@@ -130,18 +130,19 @@ function ContactPageContent() {
               ))}
             </div>
 
-            {/* Map Placeholder */}
-            <div className="bg-gray-200 rounded-lg h-96 flex items-center justify-center overflow-hidden">
-              <iframe
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3610.7319255325446!2d55.27461!3d25.2048!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f43348c5555ab%3A0x12345678!2sDubai%2C%20UAE!5e0!3m2!1sen!2s!4v1234567890"
-                allowFullScreen=""
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
-            </div>
+            {content.contact.mapEmbedUrl && (
+              <div className="bg-gray-200 rounded-lg h-96 flex items-center justify-center overflow-hidden">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  src={content.contact.mapEmbedUrl}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+            )}
           </div>
         </section>
       </main>

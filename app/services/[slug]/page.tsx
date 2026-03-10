@@ -6,17 +6,28 @@ import { useContent } from "@/lib/content-context"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, MessageCircle, Phone } from "lucide-react"
+import { ArrowRight, MessageCircle, Phone, Loader2 } from "lucide-react"
 import Link from "next/link"
 
 export default function ServicePage() {
   const params = useParams()
   const slug = params.slug as string
   const { locale } = useLocale()
-  const { content } = useContent()
+  const { content, isContentLoaded } = useContent()
   const isArabic = locale === "ar"
 
-  // Get service from content context
+  if (!isContentLoaded) {
+    return (
+      <>
+        <Navbar />
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+        <Footer />
+      </>
+    )
+  }
+
   const service = content?.services?.items?.find((s) => s.slug === slug)
   const serviceData = isArabic ? service?.ar : service?.en
 
@@ -38,11 +49,15 @@ export default function ServicePage() {
     )
   }
 
+  const phoneNumber = content.contact?.phone || ""
+  const whatsappNumber = (content.contact?.whatsapp || "").replace(/[^0-9]/g, "")
+  const prefilledMessage = content.whatsapp?.prefilledMessage || ""
+  const whatsappUrl = `https://wa.me/${whatsappNumber}${prefilledMessage ? `?text=${encodeURIComponent(prefilledMessage)}` : ""}`
+
   return (
     <>
       <Navbar />
       <main className="min-h-screen">
-        {/* Hero Section */}
         <section 
           className="relative py-16 md:py-24 text-foreground bg-cover bg-center bg-no-repeat"
           style={{
@@ -58,7 +73,6 @@ export default function ServicePage() {
           </div>
         </section>
 
-        {/* Detailed Content Section */}
         {serviceData.detailedContent && (
           <section className="py-16 md:py-24 bg-background">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -71,7 +85,6 @@ export default function ServicePage() {
           </section>
         )}
 
-        {/* CTA Section */}
         <section className="py-16 md:py-24 bg-primary text-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -90,14 +103,22 @@ export default function ServicePage() {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 bg-transparent cursor-pointer">
-                <Phone className="mr-2 h-5 w-5" />
-                {isArabic ? "اتصل الآن" : "Call Now"}
-              </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 bg-transparent cursor-pointer">
-                <MessageCircle className="mr-2 h-5 w-5" />
-                WhatsApp
-              </Button>
+              {phoneNumber && (
+                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 bg-transparent cursor-pointer" asChild>
+                  <a href={`tel:${phoneNumber}`}>
+                    <Phone className="mr-2 h-5 w-5" />
+                    {isArabic ? "اتصل الآن" : "Call Now"}
+                  </a>
+                </Button>
+              )}
+              {whatsappNumber && (
+                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 bg-transparent cursor-pointer" asChild>
+                  <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+                    <MessageCircle className="mr-2 h-5 w-5" />
+                    WhatsApp
+                  </a>
+                </Button>
+              )}
             </div>
           </div>
         </section>
