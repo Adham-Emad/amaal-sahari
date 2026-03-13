@@ -20,7 +20,8 @@ export default function SEOMetadata() {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://amaalsahari.com'
     const currentUrl = `${baseUrl}${pathname}`
 
-    const pageSEO = seoConfig.pages.find((p) => p.slug === pathname.replace('/', ''))
+    const pageSlug = pathname === '/' ? '' : pathname.split('/')[1]
+    const pageSEO = seoConfig.pages.find((p) => p.slug === pageSlug)
     const metaTitle = pageSEO?.metaTitle || seoConfig.general.defaultMetaTitle
     const metaDescription = pageSEO?.metaDescription || seoConfig.general.defaultMetaDescription
     const metaKeywords = pageSEO?.metaKeywords || seoConfig.general.metaKeywords
