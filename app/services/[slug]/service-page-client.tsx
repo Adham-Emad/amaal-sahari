@@ -8,6 +8,7 @@ import Footer from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, MessageCircle, Phone, Loader2 } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 export default function ServicePageClient() {
   const params = useParams()
@@ -54,27 +55,60 @@ export default function ServicePageClient() {
   const prefilledMessage = content.whatsapp?.prefilledMessage || ""
   const whatsappUrl = `https://wa.me/${whatsappNumber}${prefilledMessage ? `?text=${encodeURIComponent(prefilledMessage)}` : ""}`
 
+  const hasImage = Boolean(service.imageUrl)
+
   return (
     <>
       <Navbar />
       <main className="min-h-screen">
-        <section 
-          className="relative py-16 md:py-24 text-foreground bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: service.imageUrl 
-              ? `url('${service.imageUrl}')`
-              : "linear-gradient(135deg, rgba(47, 104, 62, 0.1) 0%, rgba(47, 104, 62, 0.05) 100%)",
-          }}
+
+        {/* ── Hero ── */}
+        <section
+          className="relative py-24 md:py-32 overflow-hidden"
+          style={
+            hasImage
+              ? { backgroundImage: `url('${service.imageUrl}')`, backgroundSize: "cover", backgroundPosition: "center" }
+              : undefined
+          }
         >
-          <div className="absolute inset-0 bg-white/95"></div>
+          {/* overlay */}
+          {hasImage ? (
+            <div className="absolute inset-0 bg-black/55" />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-[#2F683E] to-[#1a3a24]" />
+          )}
+
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6">{serviceData.title}</h1>
-            <p className="text-xl text-foreground-secondary max-w-3xl">{serviceData.description}</p>
+            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
+              {serviceData.title}
+            </h1>
+            <p className="text-xl text-white/85 max-w-3xl leading-relaxed">
+              {serviceData.description}
+            </p>
           </div>
         </section>
 
+        {/* ── Standalone image (below hero, when image exists) ── */}
+        {hasImage && (
+          <section className="bg-background">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
+              <div className="rounded-2xl overflow-hidden shadow-xl">
+                <Image
+                  src={service.imageUrl}
+                  alt={serviceData.title}
+                  width={1200}
+                  height={600}
+                  className="w-full h-64 sm:h-80 md:h-96 object-cover"
+                  priority
+                />
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ── Detailed content ── */}
         {serviceData.detailedContent && (
-          <section className="py-16 md:py-24 bg-background">
+          <section className={`py-16 md:py-24 bg-background ${hasImage ? "pt-12" : ""}`}>
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="prose prose-lg max-w-none">
                 {/<[a-z][\s\S]*>/i.test(serviceData.detailedContent) ? (
@@ -92,13 +126,14 @@ export default function ServicePageClient() {
           </section>
         )}
 
+        {/* ── CTA ── */}
         <section className="py-16 md:py-24 bg-primary text-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
               {isArabic ? "هل أنت مستعد للبدء؟" : "Ready to Get Started?"}
             </h2>
             <p className="text-xl text-white/80 mb-8">
-              {isArabic 
+              {isArabic
                 ? "تواصل معنا اليوم لمناقشة كيفية أن نستطيع دعم احتياجات منشأتك."
                 : "Contact us today to discuss how we can support your facility needs."
               }
