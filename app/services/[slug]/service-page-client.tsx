@@ -90,8 +90,8 @@ export default function ServicePageClient() {
 
         {/* ── Standalone image (below hero, when image exists) ── */}
         {hasImage && (
-          <section className="bg-background">
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
+          <section className="bg-background py-12">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="rounded-2xl overflow-hidden shadow-xl">
                 <Image
                   src={service.imageUrl}
@@ -108,7 +108,7 @@ export default function ServicePageClient() {
 
         {/* ── Detailed content ── */}
         {serviceData.detailedContent && (
-          <section className={`py-16 md:py-24 bg-background ${hasImage ? "pt-12" : ""}`}>
+          <section className="py-16 md:py-24 bg-background">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="prose prose-lg max-w-none">
                 {/<[a-z][\s\S]*>/i.test(serviceData.detailedContent) ? (
