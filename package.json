@@ -88,6 +88,7 @@
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "archiver": "^7.0.1",
     "pdfkit": "^0.17.2",
     "postcss": "^8.5",
     "tailwindcss": "^4.1.9",

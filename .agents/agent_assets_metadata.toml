@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "RCpnHhweTHFiujSI0itXu"
+uri = "file://public/amaalsahari-deploy.zip"
+type = "unspecified"
+title = "amaalsahari-deploy.zip"
