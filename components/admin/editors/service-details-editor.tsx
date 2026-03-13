@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import RichTextEditor from "../rich-text-editor"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Save, FileText, Image as ImageIcon } from "lucide-react"
@@ -155,22 +156,15 @@ export default function ServiceDetailsEditor() {
 
                   <div className="space-y-2">
                     <Label htmlFor={`${service.id}-en-detail`}>
-                      Detailed Content
+                      Detailed Content (supports rich text & images)
                     </Label>
-                    <Textarea
-                      id={`${service.id}-en-detail`}
+                    <RichTextEditor
                       value={service.en.detailedContent || ""}
-                      onChange={(e) =>
-                        updateServiceContent(
-                          service.id,
-                          "en",
-                          "detailedContent",
-                          e.target.value
-                        )
+                      onChange={(val) =>
+                        updateServiceContent(service.id, "en", "detailedContent", val)
                       }
                       placeholder="Enter detailed service description, features, benefits, and specifications..."
-                      rows={8}
-                      className="resize-none"
+                      dir="ltr"
                     />
                   </div>
                 </TabsContent>
@@ -219,22 +213,14 @@ export default function ServiceDetailsEditor() {
 
                   <div className="space-y-2">
                     <Label htmlFor={`${service.id}-ar-detail`}>
-                      محتوى تفصيلي
+                      محتوى تفصيلي (يدعم النص الغني والصور)
                     </Label>
-                    <Textarea
-                      id={`${service.id}-ar-detail`}
+                    <RichTextEditor
                       value={service.ar.detailedContent || ""}
-                      onChange={(e) =>
-                        updateServiceContent(
-                          service.id,
-                          "ar",
-                          "detailedContent",
-                          e.target.value
-                        )
+                      onChange={(val) =>
+                        updateServiceContent(service.id, "ar", "detailedContent", val)
                       }
                       placeholder="أدخل الوصف التفصيلي للخدمة والميزات والفوائد..."
-                      rows={8}
-                      className="resize-none"
                       dir="rtl"
                     />
                   </div>

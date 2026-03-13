@@ -10,15 +10,15 @@ import { ArrowLeft, Calendar, User } from "lucide-react"
 import Image from "next/image"
 import { useParams } from "next/navigation"
 
-export default function BlogDetailPage() {
+export default function NewsDetailPage() {
   const router = useRouter()
   const params = useParams()
-  const postId = params.id as string
+  const itemId = params.id as string
   const { locale } = useLocale()
   const { content, isContentLoaded } = useContent()
   const isArabic = locale === "ar"
 
-  const post = content.blog.posts.find((p) => p.id === postId)
+  const item = content.news.items.find((n) => n.id === itemId)
 
   if (!isContentLoaded) {
     return (
@@ -32,20 +32,17 @@ export default function BlogDetailPage() {
     )
   }
 
-  if (!post) {
+  if (!item) {
     return (
       <>
         <Navbar />
         <main className="min-h-screen bg-background flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-4xl font-bold text-foreground mb-4">
-              {isArabic ? "المقالة غير موجودة" : "Post Not Found"}
+              {isArabic ? "الخبر غير موجود" : "Article Not Found"}
             </h1>
-            <Button
-              onClick={() => router.push("/blog")}
-              className="bg-accent-orange hover:bg-accent-orange/90 text-white"
-            >
-              {isArabic ? "العودة إلى المدونة" : "Back to Blog"}
+            <Button onClick={() => router.push("/news")} className="bg-primary text-white">
+              {isArabic ? "العودة إلى الأخبار" : "Back to News"}
             </Button>
           </div>
         </main>
@@ -54,15 +51,15 @@ export default function BlogDetailPage() {
     )
   }
 
-  const postData = isArabic ? post.ar : post.en
-  const title = postData.title
-  const excerpt = postData.excerpt
-  const fullContent = postData.fullContent && postData.fullContent.trim() !== "" && postData.fullContent !== excerpt
-    ? postData.fullContent
+  const itemData = isArabic ? item.ar : item.en
+  const title = itemData.title
+  const excerpt = itemData.excerpt
+  const fullContent = itemData.fullContent && itemData.fullContent.trim() !== "" && itemData.fullContent !== excerpt
+    ? itemData.fullContent
     : null
-  const author = postData.author
-  const category = postData.category
-  const date = post.date
+  const author = itemData.author
+  const category = itemData.category
+  const date = item.date
 
   const isHTML = (str: string) => /<[a-z][\s\S]*>/i.test(str)
 
@@ -71,9 +68,9 @@ export default function BlogDetailPage() {
       <Navbar />
       <main className="min-h-screen bg-background">
         <section className="relative w-full h-96 overflow-hidden bg-gray-900">
-          {post.imageUrl ? (
+          {item.imageUrl ? (
             <Image
-              src={post.imageUrl}
+              src={item.imageUrl}
               alt={title}
               fill
               className="object-cover"
@@ -81,13 +78,13 @@ export default function BlogDetailPage() {
               sizes="100vw"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900" />
+            <div className="w-full h-full bg-gradient-to-br from-primary to-primary/60" />
           )}
           <div className="absolute inset-0 bg-black/40"></div>
           <div className="absolute inset-0 flex flex-col justify-end">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 w-full">
               <div className="mb-4">
-                <span className="inline-block bg-accent-orange text-white px-4 py-2 rounded-full text-sm font-semibold">
+                <span className="inline-block bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold">
                   {category}
                 </span>
               </div>
@@ -113,10 +110,8 @@ export default function BlogDetailPage() {
               </div>
             </div>
 
-            {/* Excerpt (lead paragraph) */}
             <p className="mb-8 text-lg text-muted-foreground italic leading-relaxed">{excerpt}</p>
 
-            {/* Full Content — only shown if different from excerpt */}
             {fullContent && (
               <div className="prose prose-lg max-w-none mb-12">
                 {isHTML(fullContent) ? (
@@ -135,11 +130,11 @@ export default function BlogDetailPage() {
 
             <div className="mt-12 pt-8 border-t border-border">
               <Button
-                onClick={() => router.push("/blog")}
-                className="bg-accent-orange hover:bg-accent-orange/90 text-white inline-flex items-center gap-2"
+                onClick={() => router.push("/news")}
+                className="bg-primary text-white inline-flex items-center gap-2"
               >
                 <ArrowLeft className="w-4 h-4" />
-                {isArabic ? "العودة إلى المدونة" : "Back to Blog"}
+                {isArabic ? "العودة إلى الأخبار" : "Back to News"}
               </Button>
             </div>
           </div>

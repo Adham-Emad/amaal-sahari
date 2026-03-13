@@ -77,9 +77,16 @@ export default function ServicePageClient() {
           <section className="py-16 md:py-24 bg-background">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="prose prose-lg max-w-none">
-                <div className="text-foreground whitespace-pre-wrap leading-relaxed">
-                  {serviceData.detailedContent}
-                </div>
+                {/<[a-z][\s\S]*>/i.test(serviceData.detailedContent) ? (
+                  <div
+                    className="text-foreground leading-relaxed rich-content"
+                    dangerouslySetInnerHTML={{ __html: serviceData.detailedContent }}
+                  />
+                ) : (
+                  <div className="text-foreground whitespace-pre-wrap leading-relaxed">
+                    {serviceData.detailedContent}
+                  </div>
+                )}
               </div>
             </div>
           </section>

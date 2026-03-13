@@ -140,6 +140,44 @@ export default function ContactEditor() {
         <TabsContent value="locations" className="space-y-4">
           <Card>
             <CardHeader>
+              <CardTitle>Locations Section Title</CardTitle>
+              <CardDescription>The heading shown above the branch locations grid</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>English Title</Label>
+                  <Input
+                    value={contact.locationsTitle?.en || "Our Locations in UAE"}
+                    onChange={(e) =>
+                      setContact({
+                        ...contact,
+                        locationsTitle: { en: e.target.value, ar: contact.locationsTitle?.ar || "مواقعنا في الإمارات" },
+                      })
+                    }
+                    placeholder="Our Locations in UAE"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Arabic Title</Label>
+                  <Input
+                    value={contact.locationsTitle?.ar || "مواقعنا في الإمارات"}
+                    onChange={(e) =>
+                      setContact({
+                        ...contact,
+                        locationsTitle: { en: contact.locationsTitle?.en || "Our Locations in UAE", ar: e.target.value },
+                      })
+                    }
+                    placeholder="مواقعنا في الإمارات"
+                    dir="rtl"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Branch Locations</CardTitle>

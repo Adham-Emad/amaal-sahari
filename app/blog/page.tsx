@@ -72,7 +72,7 @@ export default function BlogPage() {
                   </div>
                   <div className="p-6">
                     <h3 className="text-2xl font-bold text-foreground mb-3">{post.title}</h3>
-                    <p className="text-foreground-secondary mb-4">{post.excerpt}</p>
+                    <p className="text-foreground-secondary mb-4 line-clamp-3">{post.excerpt}</p>
                     <div className="flex items-center justify-between text-sm text-foreground-secondary mb-6">
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-1">

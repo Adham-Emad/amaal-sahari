@@ -10,6 +10,7 @@ import Testimonials from "@/components/testimonials"
 import ServicesVideoSection from "@/components/services-video-section"
 import KPIs from "@/components/kpis"
 import HomeNewsSection from "@/components/home-news-section"
+import GallerySection from "@/components/gallery-section"
 import { useContent } from "@/lib/content-context"
 
 export default function Home() {
@@ -37,6 +38,7 @@ export default function Home() {
         )}
         {sections?.testimonials?.visible && <Testimonials />}
         {sections?.news?.visible && <HomeNewsSection />}
+        <GallerySection />
       </main>
       <Footer />
     </>

@@ -50,6 +50,7 @@ import JobApplicationsEditor from "./editors/job-applications-editor"
 import BlogDetailsEditor from "./editors/blog-details-editor"
 import CaseStudyDetailsEditor from "./editors/case-study-details-editor"
 import CustomPagesEditor from "./editors/custom-pages-editor"
+import GalleryEditor from "./editors/gallery-editor"
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("hero")
@@ -109,6 +110,10 @@ export default function AdminDashboard() {
       <TabsTrigger value="news" className="flex items-center gap-2">
         <FileText className="w-4 h-4" />
         <span className="hidden sm:inline">News</span>
+      </TabsTrigger>
+      <TabsTrigger value="gallery" className="flex items-center gap-2">
+        <Layout className="w-4 h-4" />
+        <span className="hidden sm:inline">Gallery</span>
       </TabsTrigger>
       <TabsTrigger value="careers" className="flex items-center gap-2">
         <Users className="w-4 h-4" />
@@ -228,6 +233,10 @@ export default function AdminDashboard() {
 
   <TabsContent value="news" className="space-y-4">
     <NewsEditor />
+  </TabsContent>
+
+  <TabsContent value="gallery" className="space-y-4">
+    <GalleryEditor />
   </TabsContent>
 
   <TabsContent value="careers" className="space-y-4">

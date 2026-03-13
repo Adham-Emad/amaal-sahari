@@ -105,7 +105,9 @@ function ContactPageContent() {
         <section className="py-16 md:py-24 bg-white border-t border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-primary mb-12 text-center">
-              {locale === "ar" ? "مواقعنا في الإمارات" : "Our Locations in UAE"}
+              {locale === "ar"
+                ? (content.contact.locationsTitle?.ar || "مواقعنا في الإمارات")
+                : (content.contact.locationsTitle?.en || "Our Locations in UAE")}
             </h2>
 
             {/* Locations Grid */}

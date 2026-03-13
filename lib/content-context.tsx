@@ -217,6 +217,10 @@ export interface SiteContent {
       en: string
       ar: string
     }
+    locationsTitle?: {
+      en: string
+      ar: string
+    }
     mapEmbedUrl?: string
     locations: Array<{
       id: string
@@ -224,6 +228,20 @@ export interface SiteContent {
       email: string
       en: { city: string; address: string }
       ar: { city: string; address: string }
+    }>
+  }
+
+  // GALLERY
+  gallery?: {
+    en: { title: string; subtitle: string }
+    ar: { title: string; subtitle: string }
+    items: Array<{
+      id: string
+      type: "image" | "video"
+      url: string
+      thumbnailUrl?: string
+      en: { title: string; description: string }
+      ar: { title: string; description: string }
     }>
   }
 
@@ -808,7 +826,16 @@ const defaultContent: SiteContent = {
         ar: { city: "الشارقة", address: "منطقة الصناعية، الشار��ة" },
       },
     ],
+    locationsTitle: {
+      en: "Our Locations in UAE",
+      ar: "مواقعنا في الإمارات",
+    },
     mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3610.7319255325446!2d55.27461!3d25.2048!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f43348c5555ab%3A0x12345678!2sDubai%2C%20UAE!5e0!3m2!1sen!2s!4v1234567890",
+  },
+  gallery: {
+    en: { title: "Our Gallery", subtitle: "Explore our projects and facilities" },
+    ar: { title: "معرض صورنا", subtitle: "استعرض مشاريعنا ومرافقنا" },
+    items: [],
   },
   footer: {
     stats: [

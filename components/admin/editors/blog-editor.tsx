@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Trash2, Save } from "lucide-react"
 import FileUpload from "../file-upload"
+import RichTextEditor from "../rich-text-editor"
 
 export default function BlogEditor() {
   const { content, updateSection } = useContent()
@@ -124,10 +125,19 @@ export default function BlogEditor() {
                     />
                   </div>
                   <div>
-                    <Label>Excerpt</Label>
+                    <Label>Excerpt (summary shown in card)</Label>
                     <Textarea
                       value={post.en.excerpt}
                       onChange={(e) => updatePost(post.id, "excerpt", e.target.value, "en")}
+                    />
+                  </div>
+                  <div>
+                    <Label>Full Article Content</Label>
+                    <RichTextEditor
+                      value={post.en.fullContent || ""}
+                      onChange={(val) => updatePost(post.id, "fullContent", val, "en")}
+                      placeholder="Write the full article content here..."
+                      dir="ltr"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-2">
@@ -159,10 +169,19 @@ export default function BlogEditor() {
                     />
                   </div>
                   <div>
-                    <Label>Excerpt</Label>
+                    <Label>Excerpt (ملخص يظهر في البطاقة)</Label>
                     <Textarea
                       value={post.ar.excerpt}
                       onChange={(e) => updatePost(post.id, "excerpt", e.target.value, "ar")}
+                      dir="rtl"
+                    />
+                  </div>
+                  <div>
+                    <Label>محتوى المقالة الكاملة</Label>
+                    <RichTextEditor
+                      value={post.ar.fullContent || ""}
+                      onChange={(val) => updatePost(post.id, "fullContent", val, "ar")}
+                      placeholder="اكتب محتوى المقالة الكاملة هنا..."
                       dir="rtl"
                     />
                   </div>

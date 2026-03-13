@@ -44,6 +44,53 @@ function saveSubmission(submission: Record<string, unknown>) {
   }
 }
 
+export async function GET(request: NextRequest) {
+  try {
+    const sessionCookie = request.cookies.get('admin_session_token')
+    if (!sessionCookie?.value) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    let submissions: Record<string, unknown>[] = []
+    if (fs.existsSync(SUBMISSIONS_FILE)) {
+      submissions = JSON.parse(fs.readFileSync(SUBMISSIONS_FILE, 'utf-8'))
+    }
+    return NextResponse.json({ submissions })
+  } catch (error) {
+    console.error('[contact] GET submissions error:', error)
+    return NextResponse.json({ error: 'Failed to load submissions' }, { status: 500 })
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const sessionCookie = request.cookies.get('admin_session_token')
+    if (!sessionCookie?.value) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const body = await request.json()
+    const { id } = body
+
+    let submissions: Record<string, unknown>[] = []
+    if (fs.existsSync(SUBMISSIONS_FILE)) {
+      submissions = JSON.parse(fs.readFileSync(SUBMISSIONS_FILE, 'utf-8'))
+    }
+
+    if (id) {
+      submissions = submissions.filter((s) => s.id !== id)
+    } else {
+      submissions = []
+    }
+
+    fs.writeFileSync(SUBMISSIONS_FILE, JSON.stringify(submissions, null, 2))
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('[contact] DELETE submissions error:', error)
+    return NextResponse.json({ error: 'Failed to delete submission' }, { status: 500 })
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()

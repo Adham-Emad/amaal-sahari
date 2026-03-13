@@ -204,3 +204,53 @@ html {
     @apply cursor-pointer;
   }
 }
+
+/* Rich text content rendered from TipTap editor */
+.rich-content h2 {
+  @apply text-2xl font-bold mt-6 mb-3;
+}
+.rich-content h3 {
+  @apply text-xl font-semibold mt-5 mb-2;
+}
+.rich-content h4 {
+  @apply text-lg font-semibold mt-4 mb-2;
+}
+.rich-content p {
+  @apply mb-3 leading-relaxed;
+}
+.rich-content ul {
+  @apply list-disc list-inside mb-3 space-y-1;
+}
+.rich-content ol {
+  @apply list-decimal list-inside mb-3 space-y-1;
+}
+.rich-content li {
+  @apply leading-relaxed;
+}
+.rich-content strong {
+  @apply font-bold;
+}
+.rich-content em {
+  @apply italic;
+}
+.rich-content a {
+  @apply text-primary underline hover:text-primary/80;
+}
+.rich-content img {
+  @apply rounded-lg max-w-full h-auto my-4;
+}
+.rich-content hr {
+  @apply border-border my-6;
+}
+.rich-content blockquote {
+  @apply border-l-4 border-primary/30 pl-4 italic text-muted-foreground my-4;
+}
+
+/* TipTap placeholder */
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}

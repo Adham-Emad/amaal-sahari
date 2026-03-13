@@ -56,7 +56,7 @@ export default function HomeNewsSection() {
             return (
               <Link
                 key={newsItem.id}
-                href={`/news#${newsItem.id}`}
+                href={`/news/${newsItem.id}`}
                 className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-[#FAFBF0] hover:border-[#EA8936]"
               >
                 {/* Image */}

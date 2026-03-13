@@ -4,6 +4,13 @@ import { useEffect } from 'react'
 import { useContent } from '@/lib/content-context'
 import { usePathname } from 'next/navigation'
 
+declare global {
+  interface Window {
+    dataLayer: unknown[]
+    gtag: (...args: unknown[]) => void
+  }
+}
+
 export default function SEOMetadata() {
   const { content } = useContent()
   const pathname = usePathname()
@@ -13,7 +20,6 @@ export default function SEOMetadata() {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://amaalsahari.com'
     const currentUrl = `${baseUrl}${pathname}`
 
-    // Get page-specific SEO or use general settings
     const pageSEO = seoConfig.pages.find((p) => p.slug === pathname.replace('/', ''))
     const metaTitle = pageSEO?.metaTitle || seoConfig.general.defaultMetaTitle
     const metaDescription = pageSEO?.metaDescription || seoConfig.general.defaultMetaDescription
@@ -21,10 +27,8 @@ export default function SEOMetadata() {
     const ogImage = pageSEO?.ogImage || seoConfig.general.faviconUrl
     const canonicalUrl = pageSEO?.canonicalUrl || currentUrl
 
-    // Update document title
     document.title = metaTitle
 
-    // Update or create meta tags
     const updateMetaTag = (name: string, content: string, isProperty = false) => {
       let element = document.querySelector(`meta[${isProperty ? 'property' : 'name'}="${name}"]`) as HTMLMetaElement
       if (!element) {
@@ -48,7 +52,6 @@ export default function SEOMetadata() {
     updateMetaTag('twitter:description', metaDescription, true)
     updateMetaTag('twitter:image', ogImage, true)
 
-    // Update canonical link
     let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement
     if (!canonicalLink) {
       canonicalLink = document.createElement('link')
@@ -57,34 +60,31 @@ export default function SEOMetadata() {
     }
     canonicalLink.href = canonicalUrl
 
-    // Load Google Analytics if ID exists (only once)
-    if (seoConfig.integrations.googleAnalyticsId && !document.querySelector(`script[src*="googletagmanager.com/gtag/js?id=${seoConfig.integrations.googleAnalyticsId}"]`)) {
-      const gaScript = document.createElement('script')
-      gaScript.async = true
-      gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${seoConfig.integrations.googleAnalyticsId}`
-      document.head.appendChild(gaScript)
+    const loadGtag = (id: string) => {
+      const existing = document.querySelector(`script[data-ga-id="${id}"]`)
+      if (existing) return
 
       window.dataLayer = window.dataLayer || []
-      function gtag(...args: unknown[]) {
-        (window.dataLayer as unknown[]).push(args)
+      window.gtag = function (...args: unknown[]) {
+        window.dataLayer.push(args)
       }
-      gtag('js', new Date())
-      gtag('config', seoConfig.integrations.googleAnalyticsId)
+
+      const script = document.createElement('script')
+      script.async = true
+      script.src = `https://www.googletagmanager.com/gtag/js?id=${id}`
+      script.setAttribute('data-ga-id', id)
+      document.head.appendChild(script)
+
+      window.gtag('js', new Date())
+      window.gtag('config', id)
     }
 
-    // Load Google Tag Manager if ID exists (only once)
-    if (seoConfig.integrations.googleTagManagerId && !document.querySelector(`script[src*="googletagmanager.com/gtag/js?id=${seoConfig.integrations.googleTagManagerId}"]`)) {
-      const gtmScript = document.createElement('script')
-      gtmScript.async = true
-      gtmScript.src = `https://www.googletagmanager.com/gtag/js?id=${seoConfig.integrations.googleTagManagerId}`
-      document.head.appendChild(gtmScript)
+    if (seoConfig.integrations.googleAnalyticsId) {
+      loadGtag(seoConfig.integrations.googleAnalyticsId)
+    }
 
-      window.dataLayer = window.dataLayer || []
-      function gtag(...args: unknown[]) {
-        (window.dataLayer as unknown[]).push(args)
-      }
-      gtag('js', new Date())
-      gtag('config', seoConfig.integrations.googleTagManagerId)
+    if (seoConfig.integrations.googleTagManagerId) {
+      loadGtag(seoConfig.integrations.googleTagManagerId)
     }
   }, [content.seo, pathname])
 
