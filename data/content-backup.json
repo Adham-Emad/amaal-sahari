@@ -278,10 +278,11 @@
       {
         "id": "1",
         "slug": "housekeeping-janitorial",
-        "imageUrl": "/uploads/1773439313222-65adde6a.jpg?v=1773439318378",
+        "imageUrl": "/uploads/1773439313222-65adde6a.jpg?v=1773439318378&v=1773439378119&v=1773797031335",
         "en": {
           "title": "Housekeeping & Janitorial",
-          "description": "Professional cleaning services for your premises"
+          "description": "Professional cleaning services for your premises",
+          "detailedContent": "<img src=\"/uploads/1773797027481-80dc168c.jpg\"><p>Professional cleaning services for your premisesProfessional cleaning services for your premisesProfessional cleaning services for your premisesProfessional cleaning services for your premises Professional cleaning services for your premisesProfessional cleaning services for your premises Professional cleaning services for your premisesProfessional cleaning services for your premises Professional cleaning services for your premisesProfessional cleaning services for your premises Professional cleaning services for your premisesProfessional cleaning services for your premises</p>"
         },
         "ar": {
           "title": "التدبير المنزلي والنظافة",
@@ -471,12 +472,12 @@
     "posts": [
       {
         "id": "1",
-        "imageUrl": "/uploads/1773436536446-7fcfad8f.png?v=1773436564787",
+        "imageUrl": "/uploads/1773436536446-7fcfad8f.png?v=1773436564787&v=1773797003776",
         "date": "2025-01-15",
         "en": {
           "title": "The Importance of Cleanliness in the Workplace",
           "excerpt": "Learn how to improve your workplace environment by maintaining high cleanliness standards.",
-          "fullContent": "A clean workplace is essential for employee well-being, productivity, and safety. Regular cleaning reduces the spread of germs and illnesses, improves air quality, and creates a professional appearance for clients and visitors.\n\nProper cleaning routines should include:\n- Daily surface disinfection\n- Regular carpet and floor maintenance\n- Windows and glass cleaning\n- Break room sanitation\n- Bathroom deep cleaning\n\nInvesting in professional cleaning services ensures your workplace maintains the highest standards of cleanliness and hygiene.",
+          "fullContent": "<p>A clean workplace is essential for employee well-being, productivity, and safety. Regular cleaning reduces the spread of germs and illnesses, improves air quality, and creates a professional appearance for clients and visitors. Proper cleaning routines should include: - Daily surface disinfection - Regular carpet and floor maintenance - Windows and glass cleaning - Break room sanitation - Bathroom deep cleaning Investing in professional cleaning services ensures your workplace maintains the highest standards of cleanliness and hygiene.</p><img src=\"/uploads/1773796999532-3e4c42e6.png\"><p></p>",
           "author": "Ahmed Mohamed",
           "category": "Cleanliness"
         },
