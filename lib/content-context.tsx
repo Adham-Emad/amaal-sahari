@@ -122,7 +122,12 @@ export interface SiteContent {
   // HOMEPAGE SECTION MANAGEMENT
   homepageSections: {
     valueHighlights: { visible: boolean; en: { title: string; subtitle?: string }; ar: { title: string; subtitle?: string } }
-    servicesVideo: { visible: boolean; en: { title: string; subtitle?: string }; ar: { title: string; subtitle?: string } }
+    servicesVideo: {
+      visible: boolean
+      videoUrl?: string
+      en: { title: string; subtitle?: string; cta1?: string; cta2?: string }
+      ar: { title: string; subtitle?: string; cta1?: string; cta2?: string }
+    }
     kpis: { visible: boolean; en: { title: string; subtitle?: string }; ar: { title: string; subtitle?: string } }
     services: { visible: boolean; en: { title: string; subtitle?: string }; ar: { title: string; subtitle?: string } }
     projects: { visible: boolean; en: { title: string; subtitle?: string }; ar: { title: string; subtitle?: string } }
@@ -916,8 +921,9 @@ const defaultContent: SiteContent = {
     },
     servicesVideo: {
       visible: true,
-      en: { title: "Our Services", subtitle: "Watch how we deliver excellence" },
-      ar: { title: "خدماتنا", subtitle: "شاهد كيف نقدم التميز" },
+      videoUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Video_Generation_for_Service_Website-T7bRSMOTVgzh5VSECwLZADIh2jQ5In.mp4",
+      en: { title: "Our Services", subtitle: "Watch how we deliver excellence", cta1: "Get a Free Quote", cta2: "Explore Services" },
+      ar: { title: "خدماتنا", subtitle: "شاهد كيف نقدم التميز", cta1: "احصل على عرض مجاني", cta2: "استكشف الخدمات" },
     },
     kpis: {
       visible: true,

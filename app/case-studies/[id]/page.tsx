@@ -15,11 +15,24 @@ export default function CaseStudyDetailPage() {
   const params = useParams()
   const caseStudyId = params.id as string
   const { locale } = useLocale()
-  const { content } = useContent()
+  const { content, isContentLoaded } = useContent()
   const isArabic = locale === "ar"
 
   // Find the case study
   const caseStudy = content.caseStudies.items.find((c) => c.id === caseStudyId)
+
+  // Wait for content to load before showing "not found" to avoid flash on refresh
+  if (!isContentLoaded) {
+    return (
+      <>
+        <Navbar />
+        <main className="min-h-screen bg-background flex items-center justify-center">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        </main>
+        <Footer />
+      </>
+    )
+  }
 
   if (!caseStudy) {
     return (

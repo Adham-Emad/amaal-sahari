@@ -1,7 +1,6 @@
 "use client"
 
 import { useLocale } from "@/lib/locale-context"
-import { translations } from "@/lib/i18n"
 import { useContent } from "@/lib/content-context"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
@@ -9,20 +8,34 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { useInView } from "react-intersection-observer"
 
+const DEFAULT_VIDEO_URL =
+  "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Video_Generation_for_Service_Website-T7bRSMOTVgzh5VSECwLZADIh2jQ5In.mp4"
+
 export default function ServicesVideoSection() {
   const { locale } = useLocale()
-  const t = translations[locale]
   const { content } = useContent()
   const isArabic = locale === "ar"
   const { ref, inView } = useInView({ threshold: 0.3, triggerOnce: true })
 
+  const sv = content?.homepageSections?.servicesVideo
+
   const sectionTitle = isArabic
-    ? content?.homepageSections?.servicesVideo?.ar?.title || "خدمات ناعمة احترافية لأماكن العمل الحديثة"
-    : content?.homepageSections?.servicesVideo?.en?.title || "Professional Soft Services for Modern Workplaces"
+    ? sv?.ar?.title || "خدمات ناعمة احترافية لأماكن العمل الحديثة"
+    : sv?.en?.title || "Professional Soft Services for Modern Workplaces"
 
   const sectionSubtitle = isArabic
-    ? content?.homepageSections?.servicesVideo?.ar?.subtitle || t.hero.subtitle
-    : content?.homepageSections?.servicesVideo?.en?.subtitle || t.hero.subtitle
+    ? sv?.ar?.subtitle || ""
+    : sv?.en?.subtitle || ""
+
+  const cta1Text = isArabic
+    ? sv?.ar?.cta1 || "احصل على عرض مجاني"
+    : sv?.en?.cta1 || "Get a Free Quote"
+
+  const cta2Text = isArabic
+    ? sv?.ar?.cta2 || "استكشف الخدمات"
+    : sv?.en?.cta2 || "Explore Services"
+
+  const videoUrl = sv?.videoUrl || DEFAULT_VIDEO_URL
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -47,16 +60,12 @@ export default function ServicesVideoSection() {
   return (
     <section ref={ref} className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover">
-        <source
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Video_Generation_for_Service_Website-T7bRSMOTVgzh5VSECwLZADIh2jQ5In.mp4"
-          type="video/mp4"
-        />
+        <source src={videoUrl} type="video/mp4" />
       </video>
 
       <div className="absolute inset-0 bg-black/35" />
 
       <motion.div
-        ref={ref}
         variants={containerVariants}
         initial="hidden"
         animate={inView ? "visible" : "hidden"}
@@ -69,14 +78,16 @@ export default function ServicesVideoSection() {
           {sectionTitle}
         </motion.h1>
 
-        <motion.p variants={itemVariants} className="text-lg md:text-xl text-background/95 mb-8 max-w-2xl mx-auto">
-          {sectionSubtitle}
-        </motion.p>
+        {sectionSubtitle && (
+          <motion.p variants={itemVariants} className="text-lg md:text-xl text-background/95 mb-8 max-w-2xl mx-auto">
+            {sectionSubtitle}
+          </motion.p>
+        )}
 
         <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link href="/contact">
             <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-white font-semibold">
-              {t.hero.cta1}
+              {cta1Text}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
@@ -86,7 +97,7 @@ export default function ServicesVideoSection() {
               variant="outline"
               className="bg-background/90 hover:bg-background text-foreground border-background"
             >
-              {t.hero.cta2}
+              {cta2Text}
             </Button>
           </Link>
         </motion.div>

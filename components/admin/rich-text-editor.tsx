@@ -5,8 +5,7 @@ import StarterKit from "@tiptap/starter-kit"
 import Image from "@tiptap/extension-image"
 import Link from "@tiptap/extension-link"
 import Placeholder from "@tiptap/extension-placeholder"
-import { useEffect, useCallback } from "react"
-import { Button } from "@/components/ui/button"
+import { useEffect, useCallback, useRef, useState } from "react"
 import {
   Bold,
   Italic,
@@ -16,9 +15,11 @@ import {
   ListOrdered,
   Link as LinkIcon,
   ImageIcon,
+  Upload,
   Undo,
   Redo,
   Minus,
+  Loader2,
 } from "lucide-react"
 
 interface RichTextEditorProps {
@@ -36,6 +37,9 @@ export default function RichTextEditor({
   dir = "ltr",
   className = "",
 }: RichTextEditorProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState(false)
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -74,7 +78,7 @@ export default function RichTextEditor({
     editor.chain().focus().setLink({ href: url }).run()
   }, [editor])
 
-  const addImage = useCallback(() => {
+  const addImageByUrl = useCallback(() => {
     if (!editor) return
     const url = window.prompt("Enter image URL")
     if (url) {
@@ -82,24 +86,65 @@ export default function RichTextEditor({
     }
   }, [editor])
 
+  const handleFileChange = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0]
+      if (!file || !editor) return
+
+      setUploading(true)
+      try {
+        const formData = new FormData()
+        formData.append("file", file)
+
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        })
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}))
+          alert("Upload failed: " + (err.error || res.statusText))
+          return
+        }
+
+        const data = await res.json()
+        const url = data.url || data.filePath || data.path
+        if (url) {
+          editor.chain().focus().setImage({ src: url }).run()
+        } else {
+          alert("Upload succeeded but no URL was returned.")
+        }
+      } catch (err) {
+        alert("Upload error: " + (err instanceof Error ? err.message : String(err)))
+      } finally {
+        setUploading(false)
+        if (fileInputRef.current) fileInputRef.current.value = ""
+      }
+    },
+    [editor]
+  )
+
   if (!editor) return null
 
   const ToolbarButton = ({
     onClick,
     active,
     title,
+    disabled,
     children,
   }: {
     onClick: () => void
     active?: boolean
     title: string
+    disabled?: boolean
     children: React.ReactNode
   }) => (
     <button
       type="button"
       onClick={onClick}
       title={title}
-      className={`p-1.5 rounded text-sm hover:bg-gray-100 transition-colors ${
+      disabled={disabled}
+      className={`p-1.5 rounded text-sm hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
         active ? "bg-gray-200 text-primary font-semibold" : "text-gray-700"
       }`}
     >
@@ -109,6 +154,15 @@ export default function RichTextEditor({
 
   return (
     <div className={`border border-input rounded-md overflow-hidden ${className}`}>
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileChange}
+      />
+
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5 border-b border-input bg-gray-50">
         <ToolbarButton
@@ -166,9 +220,26 @@ export default function RichTextEditor({
         <ToolbarButton onClick={setLink} active={editor.isActive("link")} title="Insert Link">
           <LinkIcon className="w-4 h-4" />
         </ToolbarButton>
-        <ToolbarButton onClick={addImage} active={false} title="Insert Image">
+
+        {/* Image from URL */}
+        <ToolbarButton onClick={addImageByUrl} active={false} title="Insert Image by URL">
           <ImageIcon className="w-4 h-4" />
         </ToolbarButton>
+
+        {/* Image file upload */}
+        <ToolbarButton
+          onClick={() => fileInputRef.current?.click()}
+          active={false}
+          title="Upload Image from Computer"
+          disabled={uploading}
+        >
+          {uploading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Upload className="w-4 h-4" />
+          )}
+        </ToolbarButton>
+
         <div className="w-px h-5 bg-gray-200 mx-1" />
         <ToolbarButton
           onClick={() => editor.chain().focus().undo().run()}
