@@ -4,6 +4,8 @@ import { getCustomPageBySlug } from "@/lib/server-content"
 import { getCustomPageMetadata } from "@/lib/metadata"
 import CustomPageClient from "./custom-page-client"
 
+export const dynamic = 'force-dynamic'
+
 const RESERVED_SLUGS = new Set([
   "about", "admin", "api", "blog", "careers", "case-studies",
   "contact", "faqs", "forgot-password", "login", "news",

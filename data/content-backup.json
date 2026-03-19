@@ -836,6 +836,16 @@
         "canonicalUrl": "",
         "ogImage": "",
         "twitterCard": ""
+      },
+      {
+        "id": "contact",
+        "slug": "contact",
+        "metaTitle": "Contact Title",
+        "metaDescription": "This is a test for contact us",
+        "metaKeywords": "Contact, Contact Us, Contact Test, Test, COntact Us Test",
+        "canonicalUrl": "",
+        "ogImage": "",
+        "twitterCard": ""
       }
     ],
     "integrations": {
@@ -985,7 +995,7 @@
         "title": "خدماتنا",
         "subtitle": "شاهد كيف نقدم التميز"
       },
-      "videoUrl": "/uploads/1773892400216-c440140a.mov?v=1773892468020"
+      "videoUrl": "/uploads/1773893269904-d90634ad.mp4?v=1773893273570"
     },
     "kpis": {
       "visible": true,

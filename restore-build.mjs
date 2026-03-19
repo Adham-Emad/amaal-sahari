@@ -100,4 +100,14 @@ if (existsSync(join(BACKUP, 'BUILD_ID'))) {
 } else {
   console.log('No pre-built backup found — running next build...')
   execSync('next build', { stdio: 'inherit' })
+  // Save the result as the new backup so future deployments restore this build
+  if (existsSync(join(NEXT, 'BUILD_ID'))) {
+    console.log('=== Saving fresh build to backup ===')
+    if (existsSync(BACKUP)) rmSync(BACKUP, { recursive: true, force: true })
+    copyDir(NEXT, BACKUP)
+    const chunks  = readdirSync(join(BACKUP, 'static', 'chunks')).length
+    const buildId = readFileSync(join(BACKUP, 'BUILD_ID'), 'utf8').trim()
+    console.log(`=== Backup saved: ${chunks} chunks, Build ID: ${buildId} ===`)
+    installNextWrapper()
+  }
 }

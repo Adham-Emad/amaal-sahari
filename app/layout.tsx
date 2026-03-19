@@ -8,6 +8,8 @@ import SEOMetadata from "@/components/seo-metadata"
 import { getGlobalMetadata } from "@/lib/metadata"
 import "./globals.css"
 
+export const dynamic = 'force-dynamic'
+
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 const cairo = Cairo({ subsets: ["arabic"], variable: "--font-arabic" })
 

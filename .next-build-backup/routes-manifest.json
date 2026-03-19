@@ -90,6 +90,7 @@
       "regex": "^/uploads(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?\\.webm(?:/)?$"
     }
   ],
+  "onMatchHeaders": [],
   "rewrites": {
     "beforeFiles": [],
     "afterFiles": [],
