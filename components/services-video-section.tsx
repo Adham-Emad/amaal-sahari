@@ -23,7 +23,7 @@ function getVideoMimeType(url: string): string {
 
 export default function ServicesVideoSection() {
   const { locale } = useLocale()
-  const { content } = useContent()
+  const { content, isContentLoaded } = useContent()
   const isArabic = locale === "ar"
   const { ref, inView } = useInView({ threshold: 0.3, triggerOnce: true })
 
@@ -45,7 +45,9 @@ export default function ServicesVideoSection() {
     ? sv?.ar?.cta2 || "استكشف الخدمات"
     : sv?.en?.cta2 || "Explore Services"
 
-  const videoUrl = sv?.videoUrl || DEFAULT_VIDEO_URL
+  // Don't resolve the URL until content is confirmed from the server.
+  // This prevents the hardcoded default video from flashing on every page load.
+  const videoUrl = isContentLoaded ? (sv?.videoUrl || DEFAULT_VIDEO_URL) : ""
 
   const containerVariants = {
     hidden: { opacity: 0 },
