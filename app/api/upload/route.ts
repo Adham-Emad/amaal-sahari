@@ -5,7 +5,7 @@ import path from 'path'
 import crypto from 'crypto'
 import { requireAuth } from '@/lib/auth'
 
-export const maxDuration = 120
+export const maxDuration = 300
 
 const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads')
 const TEMP_UPLOADS_DIR = path.join(process.cwd(), 'data', 'temp-uploads')
@@ -73,25 +73,34 @@ export async function POST(request: NextRequest) {
     console.log('[v0] Processing file:', file.name, 'Type:', file.type, 'Size:', (file.size / 1024).toFixed(1), 'KB')
 
     const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
-    const allowedVideoTypes = ['video/mp4', 'video/webm']
+    const allowedVideoTypes = [
+      'video/mp4',
+      'video/webm',
+      'video/quicktime',   // .mov
+      'video/x-msvideo',   // .avi
+      'video/x-matroska',  // .mkv
+      'video/ogg',         // .ogv
+      'video/3gpp',        // .3gp
+      'video/x-ms-wmv',    // .wmv
+    ]
     const isImage = allowedImageTypes.includes(file.type)
-    const isVideo = allowedVideoTypes.includes(file.type)
+    const isVideo = allowedVideoTypes.includes(file.type) || file.type.startsWith('video/')
 
     if (!isImage && !isVideo) {
       console.error('[v0] Invalid file type:', file.type)
       return NextResponse.json(
-        { error: `Invalid file type: ${file.type}. Allowed: JPEG, PNG, WebP, GIF, MP4, WebM` },
+        { error: `Invalid file type: ${file.type}. Allowed image types: JPEG, PNG, WebP, GIF. Allowed video types: MP4, MOV, WebM, AVI, MKV` },
         { status: 400 }
       )
     }
 
     const maxImageSize = 5 * 1024 * 1024
-    const maxVideoSize = 50 * 1024 * 1024
+    const maxVideoSize = 200 * 1024 * 1024  // 200MB for videos
     const maxSize = isVideo ? maxVideoSize : maxImageSize
 
     if (file.size > maxSize) {
       console.error('[v0] File too large:', (file.size / 1024 / 1024).toFixed(2), 'MB')
-      const maxSizeDisplay = isVideo ? '50MB' : '5MB'
+      const maxSizeDisplay = isVideo ? '200MB' : '5MB'
       return NextResponse.json(
         { error: `File too large (${(file.size / 1024 / 1024).toFixed(2)}MB). Maximum size is ${maxSizeDisplay}` },
         { status: 413 }
@@ -130,9 +139,19 @@ export async function POST(request: NextRequest) {
         console.log('[v0] GIF detected, saving without processing')
       }
 
-      const videoExtMap: Record<string, string> = { 'video/mp4': 'mp4', 'video/webm': 'webm' }
+      const videoExtMap: Record<string, string> = {
+        'video/mp4': 'mp4',
+        'video/webm': 'webm',
+        'video/quicktime': 'mov',
+        'video/x-msvideo': 'avi',
+        'video/x-matroska': 'mkv',
+        'video/ogg': 'ogv',
+        'video/3gpp': '3gp',
+        'video/x-ms-wmv': 'wmv',
+      }
+      const videoExt = videoExtMap[file.type] || file.name.split('.').pop()?.toLowerCase() || 'mp4'
       const filename = isVideo
-        ? `${Date.now()}-${crypto.randomBytes(4).toString('hex')}.${videoExtMap[file.type] || 'mp4'}`
+        ? `${Date.now()}-${crypto.randomBytes(4).toString('hex')}.${videoExt}`
         : generateFilename(outputFormat)
       const filepath = path.join(UPLOADS_DIR, filename)
 

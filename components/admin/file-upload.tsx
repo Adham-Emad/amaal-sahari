@@ -18,16 +18,28 @@ interface FileUploadProps {
   fileType?: "image" | "video" | "any"
 }
 
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+const ALLOWED_VIDEO_TYPES = [
+  'video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo',
+  'video/x-matroska', 'video/ogg', 'video/3gpp', 'video/x-ms-wmv',
+]
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`
+}
+
 export default function FileUpload({
   label,
   description,
   value,
   onChange,
   accept = "image/*,video/*",
-  maxSize = 50 * 1024 * 1024,
+  maxSize,
   fileType = "any",
 }: FileUploadProps) {
   const [uploading, setUploading] = useState(false)
+  const [uploadingLabel, setUploadingLabel] = useState("Uploading...")
   const [error, setError] = useState("")
   const [urlInput, setUrlInput] = useState("")
   const [uploadedFileType, setUploadedFileType] = useState<string>("")
@@ -37,14 +49,41 @@ export default function FileUpload({
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Validate file size
-    if (file.size > maxSize) {
-      setError(`File too large. Maximum size is ${maxSize / 1024 / 1024}MB`)
+    const isVideoFile = file.type.startsWith("video/")
+    const isImageFile = file.type.startsWith("image/")
+
+    // Client-side MIME type check — catch bad types before any network request
+    if (fileType === "image" && !isImageFile) {
+      setError(`Please upload an image file (JPEG, PNG, WebP, GIF). Got: ${file.type || "unknown type"}`)
+      return
+    }
+    if (fileType === "video" && !isVideoFile) {
+      setError(`Please upload a video file (MP4, MOV, WebM, etc.). Got: ${file.type || "unknown type"}`)
+      return
+    }
+    if (isImageFile && !ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      setError(`Unsupported image type: ${file.type}. Please use JPEG, PNG, WebP, or GIF.`)
+      return
+    }
+    if (isVideoFile && !ALLOWED_VIDEO_TYPES.includes(file.type) && !file.type.startsWith("video/")) {
+      setError(`Unsupported file type: ${file.type}`)
+      return
+    }
+
+    // Size limits: 5 MB for images, 200 MB for videos
+    const effectiveMaxSize = maxSize ?? (isVideoFile ? 200 * 1024 * 1024 : 5 * 1024 * 1024)
+    if (file.size > effectiveMaxSize) {
+      setError(`File too large (${formatBytes(file.size)}). Maximum is ${formatBytes(effectiveMaxSize)}.`)
       return
     }
 
     setError("")
     setUploading(true)
+    setUploadingLabel(
+      isVideoFile
+        ? `Uploading video (${formatBytes(file.size)}) — this may take a minute…`
+        : `Uploading…`
+    )
 
     try {
       const formData = new FormData()
@@ -56,24 +95,19 @@ export default function FileUpload({
       })
 
       if (!response.ok) {
-        try {
-          const data = await response.json()
-          throw new Error(data.error || `Upload failed (${response.status})`)
-        } catch {
-          throw new Error(`Upload failed (${response.status}). Please check your file and try again.`)
-        }
+        const data = await response.json().catch(() => ({}))
+        throw new Error(data.error || `Upload failed (${response.status})`)
       }
 
       const data = await response.json()
       onChange(data.url)
-      setUploadedFileType(data.type)
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ""
-      }
+      setUploadedFileType(data.type || file.type)
+      if (fileInputRef.current) fileInputRef.current.value = ""
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed")
+      setError(err instanceof Error ? err.message : "Upload failed. Please try again.")
     } finally {
       setUploading(false)
+      setUploadingLabel("Uploading...")
     }
   }
 
@@ -84,8 +118,8 @@ export default function FileUpload({
     }
   }
 
-  const isImage = fileType === "image" || (fileType === "any" && (uploadedFileType.startsWith("image/") || value.includes(".jpg") || value.includes(".png") || value.includes(".webp")))
-  const isVideo = fileType === "video" || (fileType === "any" && (uploadedFileType.startsWith("video/") || value.includes(".mp4") || value.includes(".webm")))
+  const isImage = fileType === "image" || (fileType === "any" && (uploadedFileType.startsWith("image/") || /\.(jpg|jpeg|png|webp|gif)$/i.test(value)))
+  const isVideo = fileType === "video" || (fileType === "any" && (uploadedFileType.startsWith("video/") || /\.(mp4|mov|webm|avi|mkv|ogv)$/i.test(value)))
 
   return (
     <div className="space-y-4">
@@ -101,20 +135,11 @@ export default function FileUpload({
             <div className="flex-1">
               {isImage && (
                 <div className="relative w-full h-40 bg-background rounded overflow-hidden">
-                  <Image
-                    src={value}
-                    alt="Preview"
-                    fill
-                    className="object-contain"
-                  />
+                  <Image src={value} alt="Preview" fill className="object-contain" />
                 </div>
               )}
               {isVideo && (
-                <video
-                  src={value}
-                  controls
-                  className="w-full h-40 bg-background rounded"
-                />
+                <video src={value} controls className="w-full h-40 bg-background rounded" />
               )}
               {!isImage && !isVideo && (
                 <p className="text-sm text-muted-foreground truncate">{value}</p>
@@ -134,7 +159,7 @@ export default function FileUpload({
 
       {/* Upload Options */}
       <div className="space-y-4">
-        {/* File Upload */}
+        {/* File Upload Button */}
         <div className="space-y-2">
           <input
             ref={fileInputRef}
@@ -154,7 +179,7 @@ export default function FileUpload({
             {uploading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Uploading...
+                {uploadingLabel}
               </>
             ) : (
               <>
@@ -163,26 +188,28 @@ export default function FileUpload({
               </>
             )}
           </Button>
+          {uploading && (
+            <p className="text-xs text-muted-foreground text-center">
+              Please wait — do not close this page during upload.
+            </p>
+          )}
         </div>
 
         {/* URL Input */}
         <div className="space-y-2">
           <div className="flex gap-2">
             <Input
-              placeholder="Or paste URL..."
+              placeholder="Or paste a direct URL..."
               value={urlInput}
               onChange={(e) => setUrlInput(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") {
-                  handleUrlSubmit()
-                }
-              }}
+              onKeyDown={(e) => { if (e.key === "Enter") handleUrlSubmit() }}
+              disabled={uploading}
             />
             <Button
               type="button"
               variant="outline"
               onClick={handleUrlSubmit}
-              disabled={!urlInput.trim()}
+              disabled={!urlInput.trim() || uploading}
             >
               Add
             </Button>
