@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Save, Eye, EyeOff, Info, Video } from "lucide-react"
+import FileUpload from "../file-upload"
 
 export default function HomepageSectionsEditor() {
   const { content, updateSection } = useContent()
@@ -118,18 +119,15 @@ export default function HomepageSectionsEditor() {
         </CardHeader>
 
         <CardContent className="space-y-5">
-          {/* Background Video URL */}
-          <div className="space-y-2">
-            <Label>Background Video URL</Label>
-            <Input
-              value={sv.videoUrl || ""}
-              onChange={(e) => handleVideoUrlChange(e.target.value)}
-              placeholder="https://example.com/video.mp4"
-            />
-            <p className="text-xs text-muted-foreground">
-              Direct link to an MP4 video file. Leave blank to keep the current video.
-            </p>
-          </div>
+          {/* Background Video Upload */}
+          <FileUpload
+            label="Background Video"
+            description="Upload an MP4 video file or paste a direct video URL. This plays as the full-screen background on the home page."
+            value={sv.videoUrl || ""}
+            onChange={handleVideoUrlChange}
+            accept="video/*"
+            fileType="video"
+          />
 
           {/* Titles */}
           <div>
