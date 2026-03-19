@@ -1,48 +1,14 @@
-"use client"
+import type { Metadata } from "next"
+import { getPageMetadata } from "@/lib/metadata"
+import TermsPageClient from "./page-client"
 
-import { useLocale } from "@/lib/locale-context"
-import { useContent } from "@/lib/content-context"
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
-export default function TermsOfService() {
-  const { locale } = useLocale()
-  const { content } = useContent()
+export async function generateMetadata(): Promise<Metadata> {
+  return getPageMetadata("terms")
+}
 
-  const isArabic = locale === "ar"
-  const termsContent = content.termsOfService || {
-    title: { en: "Terms of Service", ar: "شروط الخدمة" },
-    lastUpdated: { en: "Last Updated: November 2025", ar: "آخر تحديث: نوفمبر 2025" },
-    sections: []
-  }
-
-  return (
-    <main className="min-h-screen bg-[#FAFBF0]">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-[#2F683E] to-[#1a3a24] text-[#FAFBF0] py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-balance">
-            {termsContent.title[locale]}
-          </h1>
-          <p className="text-lg text-[#FAFBF0]/80">
-            {termsContent.lastUpdated[locale]}
-          </p>
-        </div>
-      </section>
-
-      {/* Content Section */}
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className={`space-y-8 ${isArabic ? "text-right" : "text-left"}`}>
-          {termsContent.sections.map((section, index) => (
-            <div key={section.id}>
-              <h2 className="text-2xl font-bold text-[#2F683E] mb-4">
-                {index + 1}. {section.title[locale]}
-              </h2>
-              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                {section.content[locale]}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-    </main>
-  )
+export default function TermsPage() {
+  return <TermsPageClient />
 }

@@ -9,6 +9,7 @@ import { getGlobalMetadata } from "@/lib/metadata"
 import "./globals.css"
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 const cairo = Cairo({ subsets: ["arabic"], variable: "--font-arabic" })
