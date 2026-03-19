@@ -47,7 +47,7 @@ export default function ServicesVideoSection() {
 
   // Don't resolve the URL until content is confirmed from the server.
   // This prevents the hardcoded default video from flashing on every page load.
-  const videoUrl = isContentLoaded ? (sv?.videoUrl || DEFAULT_VIDEO_URL) : ""
+  const videoUrl = isContentLoaded ? (sv?.videoUrl || DEFAULT_VIDEO_URL) : null
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -72,8 +72,8 @@ export default function ServicesVideoSection() {
   return (
     <section ref={ref} className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* key=videoUrl forces full remount when URL changes so the browser loads the new video */}
-      <video key={videoUrl} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover">
-        <source src={videoUrl} type={getVideoMimeType(videoUrl)} />
+      <video key={videoUrl ?? "none"} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover">
+        {videoUrl && <source src={videoUrl} type={getVideoMimeType(videoUrl)} />}
       </video>
 
       <div className="absolute inset-0 bg-black/35" />
