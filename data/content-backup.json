@@ -826,7 +826,18 @@
       "metaKeywords": "facility management, cleaning services, security, workplace solutions",
       "faviconUrl": "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Amaal%20Sahari%20Web%20Logo-JeTkcT88yuJW3ZTgu8RnID1sBhHFbs.png"
     },
-    "pages": [],
+    "pages": [
+      {
+        "id": "about",
+        "slug": "about",
+        "metaTitle": "About",
+        "metaDescription": "About Description",
+        "metaKeywords": "About, About Us, Check, Test",
+        "canonicalUrl": "",
+        "ogImage": "",
+        "twitterCard": ""
+      }
+    ],
     "integrations": {
       "googleSearchConsoleId": "",
       "googleAnalyticsId": "",

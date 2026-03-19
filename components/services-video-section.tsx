@@ -11,6 +11,16 @@ import { useInView } from "react-intersection-observer"
 const DEFAULT_VIDEO_URL =
   "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Video_Generation_for_Service_Website-T7bRSMOTVgzh5VSECwLZADIh2jQ5In.mp4"
 
+function getVideoMimeType(url: string): string {
+  const clean = url.split("?")[0].toLowerCase()
+  if (clean.endsWith(".mov")) return "video/quicktime"
+  if (clean.endsWith(".webm")) return "video/webm"
+  if (clean.endsWith(".avi")) return "video/x-msvideo"
+  if (clean.endsWith(".mkv")) return "video/x-matroska"
+  if (clean.endsWith(".ogv")) return "video/ogg"
+  return "video/mp4"
+}
+
 export default function ServicesVideoSection() {
   const { locale } = useLocale()
   const { content } = useContent()
@@ -59,8 +69,9 @@ export default function ServicesVideoSection() {
 
   return (
     <section ref={ref} className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover">
-        <source src={videoUrl} type="video/mp4" />
+      {/* key=videoUrl forces full remount when URL changes so the browser loads the new video */}
+      <video key={videoUrl} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover">
+        <source src={videoUrl} type={getVideoMimeType(videoUrl)} />
       </video>
 
       <div className="absolute inset-0 bg-black/35" />
