@@ -1,3 +1,4 @@
-This file tells the build script to skip rebuilding on Hostinger.
-The .next folder in this zip was pre-built locally and should be used as-is.
-Delete this file if you want Hostinger to rebuild from source.
+This file tells restore-build.mjs to skip rebuilding on Hostinger.
+The .next-build-backup/ folder in this zip was pre-built locally and will be
+restored to .next/ by the build script before the server starts.
+Delete this file if you want the server to build from source instead.
