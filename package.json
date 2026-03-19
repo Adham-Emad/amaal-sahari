@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "next build",
+    "build": "node -e \"const fs=require('fs'),cp=require('child_process');if(fs.existsSync('.hostinger-deploy')&&fs.existsSync('.next/BUILD_ID')){console.log('Pre-built .next detected — skipping Hostinger rebuild')}else{cp.execSync('next build',{stdio:'inherit'})}\"",
     "dev": "next dev -p 5000 -H 0.0.0.0",
     "lint": "eslint .",
     "start": "next start -p 5000 -H 0.0.0.0",

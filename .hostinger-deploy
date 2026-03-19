@@ -1,0 +1,3 @@
+This file tells the build script to skip rebuilding on Hostinger.
+The .next folder in this zip was pre-built locally and should be used as-is.
+Delete this file if you want Hostinger to rebuild from source.
