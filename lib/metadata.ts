@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { getServerContent, getPageSEO, getServiceBySlug, getCustomPageBySlug } from './server-content'
+import { getServerContent, getPageSEO, getServiceBySlug, getCaseStudyById, getCustomPageBySlug } from './server-content'
 
 const DEFAULT_TITLE = 'Amaal Sahari - Integrated Facility Management Solutions'
 const DEFAULT_DESCRIPTION = 'Comprehensive facility management services providing integrated workplace solutions that enhance productivity and comfort'
@@ -55,20 +55,22 @@ export function buildMetadata(overrides: {
   }
 }
 
+// Home page — reads the page-specific entry for slug "" first, then falls back
+// to general defaults. This means admins can override home SEO in Page SEO tab.
 export function getGlobalMetadata(): Metadata {
-  return buildMetadata({ path: '/' })
+  return getPageMetadata('')
 }
 
 export function getPageMetadata(slug: string): Metadata {
   const seo = getPageSEO(slug)
-  if (!seo) return buildMetadata({ path: `/${slug}` })
+  if (!seo) return buildMetadata({ path: slug ? `/${slug}` : '/' })
   return buildMetadata({
     title: seo.title,
     description: seo.description,
     keywords: seo.keywords,
     ogImage: seo.ogImage,
     canonicalUrl: seo.canonicalUrl || undefined,
-    path: `/${slug}`,
+    path: slug ? `/${slug}` : '/',
   })
 }
 
@@ -88,6 +90,35 @@ export function getServiceMetadata(slug: string): Metadata {
     keywords: seo?.keywords || undefined,
     ogImage: service.imageUrl || undefined,
     path: `/services/${slug}`,
+  })
+
+  if (seo?.ogTitle || seo?.ogDescription) {
+    base.openGraph = {
+      ...base.openGraph,
+      title: seo.ogTitle || title,
+      description: seo.ogDescription || description,
+    }
+  }
+
+  return base
+}
+
+export function getCaseStudyMetadata(id: string): Metadata {
+  const caseStudy = getCaseStudyById(id)
+  if (!caseStudy) return buildMetadata({ path: `/case-studies/${id}` })
+
+  const data = caseStudy.en || {}
+  const seo = caseStudy.seo?.en
+
+  const title = seo?.metaTitle || (data.title ? `${data.title} | ${SITE_NAME}` : undefined)
+  const description = seo?.metaDescription || data.description || undefined
+
+  const base = buildMetadata({
+    title,
+    description,
+    keywords: seo?.keywords || undefined,
+    ogImage: caseStudy.imageUrl || undefined,
+    path: `/case-studies/${id}`,
   })
 
   if (seo?.ogTitle || seo?.ogDescription) {

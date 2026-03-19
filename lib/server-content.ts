@@ -8,6 +8,11 @@ let cachedContent: any = null
 let cacheTime = 0
 const CACHE_TTL = 5000
 
+export function invalidateContentCache() {
+  cachedContent = null
+  cacheTime = 0
+}
+
 export function getServerContent(): any {
   const now = Date.now()
   if (cachedContent && now - cacheTime < CACHE_TTL) {
@@ -48,6 +53,12 @@ export function getServiceBySlug(slug: string) {
   const content = getServerContent()
   if (!content?.services?.items) return null
   return content.services.items.find((s: any) => s.slug === slug) || null
+}
+
+export function getCaseStudyById(id: string) {
+  const content = getServerContent()
+  if (!content?.caseStudies?.items) return null
+  return content.caseStudies.items.find((c: any) => c.id === id) || null
 }
 
 export function getCustomPageBySlug(slug: string) {

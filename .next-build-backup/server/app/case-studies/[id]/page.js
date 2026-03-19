@@ -1,6 +1,6 @@
 var R=require("../../../chunks/ssr/[turbopack]_runtime.js")("server/app/case-studies/[id]/page.js")
 R.c("server/chunks/ssr/[root-of-the-server]__05.60_h._.js")
-R.c("server/chunks/ssr/node_modules_next_dist_esm_build_templates_app-page_03m191_.js")
+R.c("server/chunks/ssr/node_modules_next_dist_esm_build_templates_app-page_00_rnp_.js")
 R.c("server/chunks/ssr/node_modules_next_dist_0c~2wt7._.js")
 R.c("server/chunks/ssr/[root-of-the-server]__0oku6qf._.js")
 R.c("server/chunks/ssr/node_modules_next_dist_0-iu0c8._.js")
@@ -11,6 +11,8 @@ R.c("server/chunks/ssr/lib_utils_ts_0ks3cu5._.js")
 R.c("server/chunks/ssr/node_modules_next_dist_client_components_0ee1czk._.js")
 R.c("server/chunks/ssr/node_modules_next_dist_client_components_builtin_unauthorized_0cjv-23.js")
 R.c("server/chunks/ssr/node_modules_next_dist_client_components_builtin_global-error_0lgvd_..js")
+R.c("server/chunks/ssr/app_case-studies_layout_tsx_0r2j70i._.js")
+R.c("server/chunks/ssr/app_case-studies_[id]_layout_tsx_12oarup._.js")
 R.c("server/chunks/ssr/_next-internal_server_app_case-studies_[id]_page_actions_0-y60~b.js")
-R.m(19821)
-module.exports=R.m(19821).exports
+R.m(55147)
+module.exports=R.m(55147).exports

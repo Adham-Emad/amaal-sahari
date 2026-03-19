@@ -12,326 +12,246 @@ import { Save } from "lucide-react"
 
 export default function SubpageSeoEditor() {
   const { content, updateSection } = useContent()
-  const [services, setServices] = useState(content.services)
-  const [saved, setSaved] = useState(false)
-  const [selectedService, setSelectedService] = useState(services.items[0]?.id || "")
+  const [mode, setMode] = useState<"services" | "case-studies">("services")
 
-  useEffect(() => {
-    setServices(content.services)
-  }, [content.services])
+  // ── Services state ────────────────────────────────────────────────────────
+  const [services, setServices] = useState(content.services)
+  const [selectedService, setSelectedService] = useState(content.services.items[0]?.id || "")
+  const [servicesSaved, setServicesSaved] = useState(false)
+
+  useEffect(() => { setServices(content.services) }, [content.services])
 
   const currentService = services.items.find((s) => s.id === selectedService)
 
-  const handleUpdateService = (field: string, locale: string, value: string) => {
+  const handleUpdateServiceMeta = (field: string, locale: string, value: string) => {
     setServices({
       ...services,
-      items: services.items.map((service) =>
-        service.id === selectedService
-          ? {
-              ...service,
-              [locale]: {
-                ...service[locale],
-                [field]: value,
-              },
-            }
-          : service
+      items: services.items.map((s) =>
+        s.id === selectedService
+          ? { ...s, seo: { ...s.seo, [locale]: { ...s.seo?.[locale] ?? {}, [field]: value } } }
+          : s
       ),
     })
   }
 
-  const handleUpdateMeta = (field: string, locale: string, value: string) => {
-    setServices({
-      ...services,
-      items: services.items.map((service) =>
-        service.id === selectedService
-          ? {
-              ...service,
-              seo: {
-                ...service.seo,
-                [locale]: {
-                  ...service.seo?.[locale] || {},
-                  [field]: value,
-                },
-              },
-            }
-          : service
-      ),
-    })
-  }
-
-  const handleSave = () => {
+  const handleSaveServices = () => {
     updateSection("services", services)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+    setServicesSaved(true)
+    setTimeout(() => setServicesSaved(false), 2000)
   }
 
-  if (!currentService) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-gray-500">No services found</p>
-      </div>
-    )
+  // ── Case Studies state ────────────────────────────────────────────────────
+  const [caseStudies, setCaseStudies] = useState(content.caseStudies)
+  const [selectedCs, setSelectedCs] = useState(content.caseStudies.items[0]?.id || "")
+  const [csSaved, setCsSaved] = useState(false)
+
+  useEffect(() => { setCaseStudies(content.caseStudies) }, [content.caseStudies])
+
+  const currentCs = caseStudies.items.find((c) => c.id === selectedCs)
+
+  const handleUpdateCsMeta = (field: string, locale: string, value: string) => {
+    setCaseStudies({
+      ...caseStudies,
+      items: caseStudies.items.map((c) =>
+        c.id === selectedCs
+          ? { ...c, seo: { ...c.seo, [locale]: { ...c.seo?.[locale] ?? {}, [field]: value } } }
+          : c
+      ),
+    })
   }
+
+  const handleSaveCaseStudies = () => {
+    updateSection("caseStudies", caseStudies)
+    setCsSaved(true)
+    setTimeout(() => setCsSaved(false), 2000)
+  }
+
+  // ── Shared SEO field renderer ──────────────────────────────────────────────
+  const renderSeoFields = (
+    getVal: (field: string, locale: string) => string,
+    setVal: (field: string, locale: string, value: string) => void
+  ) => (
+    <Tabs defaultValue="english" className="w-full">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="english">English</TabsTrigger>
+        <TabsTrigger value="arabic">العربية</TabsTrigger>
+      </TabsList>
+
+      {(["english", "arabic"] as const).map((lang) => {
+        const locale = lang === "english" ? "en" : "ar"
+        const isAr = locale === "ar"
+        return (
+          <TabsContent key={lang} value={lang} className="space-y-4 mt-4">
+            <div>
+              <Label>{isAr ? "عنوان Meta" : "Meta Title"} <span className="text-muted-foreground text-xs">(60 {isAr ? "حرف كحد أقصى" : "chars max"})</span></Label>
+              <Input
+                maxLength={60}
+                value={getVal("metaTitle", locale)}
+                onChange={(e) => setVal("metaTitle", locale, e.target.value)}
+                placeholder={isAr ? "عنوان الصفحة لنتائج البحث" : "Page title for search results"}
+                dir={isAr ? "rtl" : "ltr"}
+              />
+              <p className="text-xs text-muted-foreground mt-1">{getVal("metaTitle", locale).length}/60</p>
+            </div>
+
+            <div>
+              <Label>{isAr ? "وصف Meta" : "Meta Description"} <span className="text-muted-foreground text-xs">(160 {isAr ? "حرف كحد أقصى" : "chars max"})</span></Label>
+              <Textarea
+                maxLength={160}
+                value={getVal("metaDescription", locale)}
+                onChange={(e) => setVal("metaDescription", locale, e.target.value)}
+                placeholder={isAr ? "وصف الصفحة لنتائج البحث" : "Page description for search results"}
+                rows={3}
+                dir={isAr ? "rtl" : "ltr"}
+              />
+              <p className="text-xs text-muted-foreground mt-1">{getVal("metaDescription", locale).length}/160</p>
+            </div>
+
+            <div>
+              <Label>{isAr ? "الكلمات المفتاحية" : "Keywords"}</Label>
+              <Input
+                value={getVal("keywords", locale)}
+                onChange={(e) => setVal("keywords", locale, e.target.value)}
+                placeholder={isAr ? "كلمات مفصولة بفواصل" : "Comma-separated keywords"}
+                dir={isAr ? "rtl" : "ltr"}
+              />
+            </div>
+
+            <div>
+              <Label>{isAr ? "عنوان OG (وسائل التواصل)" : "OG Title (Social Media)"}</Label>
+              <Input
+                value={getVal("ogTitle", locale)}
+                onChange={(e) => setVal("ogTitle", locale, e.target.value)}
+                placeholder={isAr ? "كيف يظهر على وسائل التواصل الاجتماعي" : "How it appears on social media"}
+                dir={isAr ? "rtl" : "ltr"}
+              />
+            </div>
+
+            <div>
+              <Label>{isAr ? "وصف OG (وسائل التواصل)" : "OG Description (Social Media)"}</Label>
+              <Textarea
+                value={getVal("ogDescription", locale)}
+                onChange={(e) => setVal("ogDescription", locale, e.target.value)}
+                placeholder={isAr ? "الوصف لمشاركة وسائل التواصل الاجتماعي" : "Description for social media sharing"}
+                rows={3}
+                dir={isAr ? "rtl" : "ltr"}
+              />
+            </div>
+          </TabsContent>
+        )
+      })}
+    </Tabs>
+  )
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Subpage SEO Settings</h2>
-          <p className="text-sm text-gray-600">Manage SEO for individual service pages</p>
+          <p className="text-sm text-gray-600">Manage per-page SEO for services and case studies</p>
         </div>
-        <Button onClick={handleSave} className="gap-2">
+        <Button
+          onClick={mode === "services" ? handleSaveServices : handleSaveCaseStudies}
+          className="gap-2"
+        >
           <Save className="w-4 h-4" />
-          {saved ? "Saved!" : "Save Changes"}
+          {mode === "services"
+            ? (servicesSaved ? "Saved!" : "Save Changes")
+            : (csSaved ? "Saved!" : "Save Changes")}
         </Button>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Select Service Page</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <select
-            value={selectedService}
-            onChange={(e) => setSelectedService(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-          >
-            {services.items.map((service) => (
-              <option key={service.id} value={service.id}>
-                {service.en.title} / {service.ar.title}
-              </option>
-            ))}
-          </select>
-        </CardContent>
-      </Card>
+      {/* Mode switcher */}
+      <div className="flex gap-2 border-b pb-2">
+        <button
+          onClick={() => setMode("services")}
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            mode === "services" ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+          }`}
+        >
+          Services
+        </button>
+        <button
+          onClick={() => setMode("case-studies")}
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            mode === "case-studies" ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+          }`}
+        >
+          Case Studies
+        </button>
+      </div>
 
-      <Tabs defaultValue="english" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="english">English</TabsTrigger>
-          <TabsTrigger value="arabic">العربية</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="english" className="space-y-6">
+      {/* ── SERVICES ── */}
+      {mode === "services" && (
+        <>
           <Card>
-            <CardHeader>
-              <CardTitle>Page Content</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="en-title">Title</Label>
-                <Input
-                  id="en-title"
-                  value={currentService.en.title}
-                  onChange={(e) => handleUpdateService("title", "en", e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="en-description">Short Description</Label>
-                <Textarea
-                  id="en-description"
-                  value={currentService.en.description}
-                  onChange={(e) => handleUpdateService("description", "en", e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="en-content">Detailed Content</Label>
-                <Textarea
-                  id="en-content"
-                  value={currentService.en.detailedContent || ""}
-                  onChange={(e) => handleUpdateService("detailedContent", "en", e.target.value)}
-                  rows={6}
-                />
-              </div>
+            <CardHeader><CardTitle>Select Service</CardTitle></CardHeader>
+            <CardContent>
+              <select
+                value={selectedService}
+                onChange={(e) => setSelectedService(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              >
+                {services.items.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.en?.title} / {s.ar?.title}
+                  </option>
+                ))}
+              </select>
             </CardContent>
           </Card>
 
+          {currentService && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{currentService.en?.title} — SEO</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {renderSeoFields(
+                  (field, locale) => currentService.seo?.[locale]?.[field] ?? "",
+                  handleUpdateServiceMeta
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </>
+      )}
+
+      {/* ── CASE STUDIES ── */}
+      {mode === "case-studies" && (
+        <>
           <Card>
-            <CardHeader>
-              <CardTitle>SEO Metadata (English)</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="en-meta-title">Meta Title (60 chars max)</Label>
-                <Input
-                  id="en-meta-title"
-                  maxLength={60}
-                  value={currentService.seo?.en?.metaTitle || ""}
-                  onChange={(e) => handleUpdateMeta("metaTitle", "en", e.target.value)}
-                  placeholder="Page title for search results"
-                />
-                <span className="text-xs text-gray-500">
-                  {currentService.seo?.en?.metaTitle?.length || 0}/60
-                </span>
-              </div>
-
-              <div>
-                <Label htmlFor="en-meta-desc">Meta Description (160 chars max)</Label>
-                <Textarea
-                  id="en-meta-desc"
-                  maxLength={160}
-                  value={currentService.seo?.en?.metaDescription || ""}
-                  onChange={(e) => handleUpdateMeta("metaDescription", "en", e.target.value)}
-                  placeholder="Page description for search results"
-                  rows={3}
-                />
-                <span className="text-xs text-gray-500">
-                  {currentService.seo?.en?.metaDescription?.length || 0}/160
-                </span>
-              </div>
-
-              <div>
-                <Label htmlFor="en-keywords">Keywords</Label>
-                <Input
-                  id="en-keywords"
-                  value={currentService.seo?.en?.keywords || ""}
-                  onChange={(e) => handleUpdateMeta("keywords", "en", e.target.value)}
-                  placeholder="Comma-separated keywords"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="en-slug">URL Slug</Label>
-                <Input
-                  id="en-slug"
-                  value={currentService.slug}
-                  onChange={(e) => 
-                    setServices({
-                      ...services,
-                      items: services.items.map((s) =>
-                        s.id === selectedService ? { ...s, slug: e.target.value } : s
-                      ),
-                    })
-                  }
-                  placeholder="e.g., housekeeping-services"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="en-og-title">OG Title (Social Media)</Label>
-                <Input
-                  id="en-og-title"
-                  value={currentService.seo?.en?.ogTitle || ""}
-                  onChange={(e) => handleUpdateMeta("ogTitle", "en", e.target.value)}
-                  placeholder="How it appears on social media"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="en-og-desc">OG Description (Social Media)</Label>
-                <Textarea
-                  id="en-og-desc"
-                  value={currentService.seo?.en?.ogDescription || ""}
-                  onChange={(e) => handleUpdateMeta("ogDescription", "en", e.target.value)}
-                  placeholder="Description for social media sharing"
-                  rows={3}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="arabic" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>محتوى الصفحة</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="ar-title">العنوان</Label>
-                <Input
-                  id="ar-title"
-                  value={currentService.ar.title}
-                  onChange={(e) => handleUpdateService("title", "ar", e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="ar-description">الوصف القصير</Label>
-                <Textarea
-                  id="ar-description"
-                  value={currentService.ar.description}
-                  onChange={(e) => handleUpdateService("description", "ar", e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="ar-content">المحتوى المفصل</Label>
-                <Textarea
-                  id="ar-content"
-                  value={currentService.ar.detailedContent || ""}
-                  onChange={(e) => handleUpdateService("detailedContent", "ar", e.target.value)}
-                  rows={6}
-                />
-              </div>
+            <CardHeader><CardTitle>Select Case Study</CardTitle></CardHeader>
+            <CardContent>
+              <select
+                value={selectedCs}
+                onChange={(e) => setSelectedCs(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              >
+                {caseStudies.items.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.en?.title} / {c.ar?.title}
+                  </option>
+                ))}
+              </select>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>بيانات SEO (العربية)</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="ar-meta-title">عنوان Meta (60 حرف كحد أقصى)</Label>
-                <Input
-                  id="ar-meta-title"
-                  maxLength={60}
-                  value={currentService.seo?.ar?.metaTitle || ""}
-                  onChange={(e) => handleUpdateMeta("metaTitle", "ar", e.target.value)}
-                  placeholder="عنوان الصفحة لنتائج البحث"
-                />
-                <span className="text-xs text-gray-500">
-                  {currentService.seo?.ar?.metaTitle?.length || 0}/60
-                </span>
-              </div>
-
-              <div>
-                <Label htmlFor="ar-meta-desc">وصف Meta (160 حرف كحد أقصى)</Label>
-                <Textarea
-                  id="ar-meta-desc"
-                  maxLength={160}
-                  value={currentService.seo?.ar?.metaDescription || ""}
-                  onChange={(e) => handleUpdateMeta("metaDescription", "ar", e.target.value)}
-                  placeholder="وصف الصفحة لنتائج البحث"
-                  rows={3}
-                />
-                <span className="text-xs text-gray-500">
-                  {currentService.seo?.ar?.metaDescription?.length || 0}/160
-                </span>
-              </div>
-
-              <div>
-                <Label htmlFor="ar-keywords">الكلمات المفتاحية</Label>
-                <Input
-                  id="ar-keywords"
-                  value={currentService.seo?.ar?.keywords || ""}
-                  onChange={(e) => handleUpdateMeta("keywords", "ar", e.target.value)}
-                  placeholder="كلمات مفصولة بفواصل"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="ar-og-title">عنوان OG (وسائل التواصل)</Label>
-                <Input
-                  id="ar-og-title"
-                  value={currentService.seo?.ar?.ogTitle || ""}
-                  onChange={(e) => handleUpdateMeta("ogTitle", "ar", e.target.value)}
-                  placeholder="كيف يظهر على وسائل التواصل الاجتماعي"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="ar-og-desc">وصف OG (وسائل التواصل)</Label>
-                <Textarea
-                  id="ar-og-desc"
-                  value={currentService.seo?.ar?.ogDescription || ""}
-                  onChange={(e) => handleUpdateMeta("ogDescription", "ar", e.target.value)}
-                  placeholder="الوصف لمشاركة وسائل التواصل الاجتماعي"
-                  rows={3}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+          {currentCs && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{currentCs.en?.title} — SEO</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {renderSeoFields(
+                  (field, locale) => currentCs.seo?.[locale]?.[field] ?? "",
+                  handleUpdateCsMeta
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </>
+      )}
     </div>
   )
 }

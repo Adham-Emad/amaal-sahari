@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs'
 import path from 'path'
 import { requireAuth } from '@/lib/auth'
+import { invalidateContentCache } from '@/lib/server-content'
 
 // File-based persistent storage with Hostinger optimization
 const DATA_DIR = path.join(process.cwd(), 'data')
@@ -452,6 +453,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('[v0] Save VERIFIED - content persisted to disk permanently in', elapsed, 'ms')
+    invalidateContentCache()
 
     return NextResponse.json({
       success: true,

@@ -4,7 +4,7 @@
 type AppRoutes = "/" | "/[slug]" | "/about" | "/admin" | "/admin/forgot-password" | "/admin/smtp-check" | "/blog" | "/blog/[id]" | "/careers" | "/case-studies/[id]" | "/contact" | "/faqs" | "/news" | "/news/[id]" | "/p/[slug]" | "/privacy" | "/services/[slug]" | "/terms"
 type AppRouteHandlerRoutes = "/api/auth/change-password" | "/api/auth/login" | "/api/auth/logout" | "/api/auth/reset-password" | "/api/auth/session" | "/api/auth/smtp-diagnostic" | "/api/contact" | "/api/content" | "/api/upload"
 type PageRoutes = never
-type LayoutRoutes = "/" | "/about" | "/admin" | "/blog" | "/careers" | "/contact" | "/faqs" | "/news" | "/privacy" | "/terms"
+type LayoutRoutes = "/" | "/about" | "/admin" | "/blog" | "/careers" | "/case-studies" | "/case-studies/[id]" | "/contact" | "/faqs" | "/news" | "/privacy" | "/services" | "/terms"
 type RedirectRoutes = "/page"
 type RewriteRoutes = never
 type Routes = AppRoutes | PageRoutes | LayoutRoutes | RedirectRoutes | RewriteRoutes | AppRouteHandlerRoutes
@@ -29,6 +29,7 @@ interface ParamMap {
   "/blog": {}
   "/blog/[id]": { "id": string; }
   "/careers": {}
+  "/case-studies": {}
   "/case-studies/[id]": { "id": string; }
   "/contact": {}
   "/faqs": {}
@@ -37,6 +38,7 @@ interface ParamMap {
   "/p/[slug]": { "slug": string; }
   "/page": {}
   "/privacy": {}
+  "/services": {}
   "/services/[slug]": { "slug": string; }
   "/terms": {}
 }
@@ -50,10 +52,13 @@ interface LayoutSlotMap {
   "/admin": never
   "/blog": never
   "/careers": never
+  "/case-studies": never
+  "/case-studies/[id]": never
   "/contact": never
   "/faqs": never
   "/news": never
   "/privacy": never
+  "/services": never
   "/terms": never
 }
 
