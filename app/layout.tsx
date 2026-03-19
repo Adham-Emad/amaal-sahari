@@ -33,6 +33,29 @@ export default function RootLayout({
         <link rel="icon" href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Amaal%20Sahari%20Web%20Logo-JeTkcT88yuJW3ZTgu8RnID1sBhHFbs.png" type="image/png" />
         <link rel="apple-touch-icon" href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Amaal%20Sahari%20Web%20Logo-JeTkcT88yuJW3ZTgu8RnID1sBhHFbs.png" />
         <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
+        {/* ChunkLoadError recovery: if a JS chunk 404s after a new deployment,
+            hard-reload once to fetch fresh HTML with up-to-date chunk hashes. */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function() {
+            function handleChunkError(e) {
+              var isChunkError = (
+                (e.message && (e.message.indexOf('ChunkLoadError') !== -1 || e.message.indexOf('Failed to load chunk') !== -1)) ||
+                (e.reason && e.reason.name === 'ChunkLoadError')
+              );
+              if (isChunkError) {
+                var key = 'chunk_reload_at';
+                var last = parseInt(sessionStorage.getItem(key) || '0', 10);
+                var now = Date.now();
+                if (now - last > 30000) {
+                  sessionStorage.setItem(key, String(now));
+                  window.location.reload();
+                }
+              }
+            }
+            window.addEventListener('error', handleChunkError);
+            window.addEventListener('unhandledrejection', handleChunkError);
+          })();
+        ` }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

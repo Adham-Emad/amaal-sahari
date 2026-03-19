@@ -17,6 +17,15 @@ const nextConfig = {
   ].filter(Boolean),
   async headers() {
     return [
+      // Prevent browsers from caching HTML pages so chunk hashes are always fresh after a deploy
+      {
+        source: '/((?!_next/static|_next/image|favicon|uploads|images).*)',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, proxy-revalidate' },
+          { key: 'Pragma', value: 'no-cache' },
+          { key: 'Expires', value: '0' },
+        ],
+      },
       {
         source: '/uploads/:file*.mov',
         headers: [{ key: 'Content-Type', value: 'video/quicktime' }],
