@@ -55,10 +55,16 @@ export function buildMetadata(overrides: {
   }
 }
 
-// Home page — reads the page-specific entry for slug "" first, then falls back
-// to general defaults. This means admins can override home SEO in Page SEO tab.
+// Root layout metadata — also injects Google Search Console verification from CMS.
+// Child layouts override title/description etc. per-page via getPageMetadata(slug).
 export function getGlobalMetadata(): Metadata {
-  return getPageMetadata('')
+  const base = getPageMetadata('')
+  const content = getServerContent()
+  const scId = content?.seo?.integrations?.googleSearchConsoleId?.trim()
+  if (scId) {
+    base.verification = { google: scId }
+  }
+  return base
 }
 
 export function getPageMetadata(slug: string): Metadata {
