@@ -17,10 +17,13 @@ A Next.js 16 bilingual (Arabic/English) website for "Amaal Sahari" — an integr
 - **Authentication**: Server-side auth with PBKDF2 password hashing, HMAC session tokens stored in HttpOnly cookies. Credentials in `.admin-credentials.json`.
 - **File Uploads**: `/api/upload` endpoint processes images with sharp, stores in `public/uploads/`. MIME-to-format mapping ensures filename extensions match actual output format.
 - **Locale**: Bilingual EN/AR with RTL support via `lib/locale-context.tsx`. Locale persisted in localStorage.
-- **SEO**: Server-side `generateMetadata()` exports on all pages via `lib/metadata.ts` (reads from `lib/server-content.ts`). Client-side dynamic updates via `components/seo-metadata.tsx`.
+- **SEO**: Custom HTTP server (`server.mjs`) intercepts every HTML response and injects live meta tags (title, description, keywords, og:*, twitter:*) from `data/content.json` at request time (5-second cache). This bypasses Hostinger's static pre-rendering. All pages also export `force-dynamic` + `generateMetadata()` via `lib/metadata.ts` as a fallback. Admin-panel changes propagate within 5 seconds — no rebuild or redeploy required.
 - **Rich Text Rendering**: `isHTML()` helper detects HTML content; HTML rendered via `dangerouslySetInnerHTML` with `.rich-content` class; plain text rendered with `whitespace-pre-wrap`.
 
 ## Key Files
+- `server.mjs` — **CRITICAL**: Custom Node.js HTTP server that intercepts HTML responses and injects live SEO meta tags from content.json on every request. Used as the production start command. Handles Next.js 16's Uint8Array chunks, deferred writeHead for HTML, 5-second content cache, and LiteSpeed cache-control headers.
+- `create-zip.mjs` — Creates deployment zip for Hostinger. Ships content.json as content-init.json; production data is preserved across deployments.
+- `restore-build.mjs` — Run on server startup: restores `.next` from backup, seeds content.json from content-init.json only on first deploy.
 - `lib/content-context.tsx` — Content model (SiteContent type), default content, ContentProvider with `isContentLoaded` state
 - `lib/auth.ts` — Server-side authentication (PBKDF2, HMAC sessions)
 - `lib/server-content.ts` — Server-side content reading for SEO/metadata

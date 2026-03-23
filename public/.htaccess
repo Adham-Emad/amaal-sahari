@@ -1,0 +1,22 @@
+# Disable caching for all HTML content so admin-panel SEO changes are immediately live
+
+<IfModule mod_headers.c>
+    # HTML responses must never be cached
+    <FilesMatch "\.(html|htm)$">
+        Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+        Header set X-LiteSpeed-Cache-Control "no-cache"
+    </FilesMatch>
+
+    # Also disable for paths without extensions (Next.js pages)
+    Header always set Cache-Control "no-store, no-cache, must-revalidate, max-age=0" "expr=%{CONTENT_TYPE} =~ /text\/html/"
+    Header always set X-LiteSpeed-Cache-Control "no-cache" "expr=%{CONTENT_TYPE} =~ /text\/html/"
+</IfModule>
+
+# LiteSpeed-specific: disable the LiteSpeed Cache plugin for this app
+<IfModule LiteSpeed>
+    RewriteEngine On
+    RewriteRule .* - [E=no-cache:1]
+    CacheEnable off
+</IfModule>
