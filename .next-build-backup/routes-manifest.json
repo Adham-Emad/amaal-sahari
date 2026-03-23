@@ -238,6 +238,12 @@
       "namedRegex": "^/api/content(?:/)?$"
     },
     {
+      "page": "/api/seo-status",
+      "regex": "^/api/seo\\-status(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/seo\\-status(?:/)?$"
+    },
+    {
       "page": "/api/upload",
       "regex": "^/api/upload(?:/)?$",
       "routeKeys": {},

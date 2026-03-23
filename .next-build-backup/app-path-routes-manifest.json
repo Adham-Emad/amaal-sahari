@@ -14,6 +14,7 @@
   "/api/auth/smtp-diagnostic/route": "/api/auth/smtp-diagnostic",
   "/api/contact/route": "/api/contact",
   "/api/content/route": "/api/content",
+  "/api/seo-status/route": "/api/seo-status",
   "/api/upload/route": "/api/upload",
   "/blog/[id]/page": "/blog/[id]",
   "/blog/page": "/blog",

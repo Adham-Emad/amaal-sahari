@@ -14,6 +14,7 @@
   "/api/auth/smtp-diagnostic/route": "app/api/auth/smtp-diagnostic/route.js",
   "/api/contact/route": "app/api/contact/route.js",
   "/api/content/route": "app/api/content/route.js",
+  "/api/seo-status/route": "app/api/seo-status/route.js",
   "/api/upload/route": "app/api/upload/route.js",
   "/blog/[id]/page": "app/blog/[id]/page.js",
   "/blog/page": "app/blog/page.js",

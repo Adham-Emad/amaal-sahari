@@ -248,6 +248,9 @@ createServer((req, res) => {
     return origEnd(outBuf, typeof callback === 'function' ? callback : undefined)
   }
 
+  // Mark this response as handled by our SEO server so headers are checkable
+  res.setHeader('X-SEO-Server', '1')
+
   handle(req, res, url)
 
 }).listen(PORT, '0.0.0.0', err => {
