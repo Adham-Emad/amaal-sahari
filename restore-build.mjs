@@ -22,6 +22,27 @@ import {
 import { join, resolve } from 'path'
 import { execSync } from 'child_process'
 
+// ─── Content.json preservation ────────────────────────────────────────────────
+// If content.json doesn't exist (fresh deploy), initialize from content-init.json
+// so that admin-panel data configured on production survives new zip deployments.
+function ensureContentJson() {
+  const contentFile = 'data/content.json'
+  const initFile    = 'data/content-init.json'
+  if (!existsSync(contentFile)) {
+    if (existsSync(initFile)) {
+      try {
+        mkdirSync('data', { recursive: true })
+        copyFileSync(initFile, contentFile)
+        console.log('=== Initialized data/content.json from content-init.json ===')
+      } catch (e) {
+        console.warn('=== Warning: could not initialize content.json:', e.message, '===')
+      }
+    } else {
+      console.warn('=== Warning: no content.json or content-init.json found ===')
+    }
+  }
+}
+
 const BACKUP = '.next-build-backup'
 const NEXT   = '.next'
 
@@ -85,6 +106,9 @@ child.on('error', err => { console.error(err); process.exit(1) })
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
+
+// Ensure content.json exists before starting the server
+ensureContentJson()
 
 if (existsSync(join(BACKUP, 'BUILD_ID'))) {
   console.log('=== Pre-built backup found — restoring .next from backup ===')

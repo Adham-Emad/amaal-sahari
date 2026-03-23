@@ -68,3 +68,15 @@ export function getCustomPageBySlug(slug: string) {
     (p: any) => p.slug === slug && p.status === 'published'
   ) || null
 }
+
+export function getBlogPostById(id: string) {
+  const content = getServerContent()
+  if (!content?.blog?.posts) return null
+  return content.blog.posts.find((p: any) => p.id === id) || null
+}
+
+export function getNewsItemById(id: string) {
+  const content = getServerContent()
+  if (!content?.news?.items) return null
+  return content.news.items.find((n: any) => n.id === id) || null
+}

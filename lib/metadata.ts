@@ -1,5 +1,14 @@
 import type { Metadata } from 'next'
-import { getServerContent, getPageSEO, getServiceBySlug, getCaseStudyById, getCustomPageBySlug } from './server-content'
+import { unstable_noStore as noStore } from 'next/cache'
+import {
+  getServerContent,
+  getPageSEO,
+  getServiceBySlug,
+  getCaseStudyById,
+  getCustomPageBySlug,
+  getBlogPostById,
+  getNewsItemById,
+} from './server-content'
 
 const DEFAULT_TITLE = 'Amaal Sahari - Integrated Facility Management Solutions'
 const DEFAULT_DESCRIPTION = 'Comprehensive facility management services providing integrated workplace solutions that enhance productivity and comfort'
@@ -18,6 +27,7 @@ export function buildMetadata(overrides: {
   canonicalUrl?: string
   path?: string
 }): Metadata {
+  noStore()
   const content = getServerContent()
   const general = content?.seo?.general
 
@@ -55,9 +65,8 @@ export function buildMetadata(overrides: {
   }
 }
 
-// Root layout metadata — also injects Google Search Console verification from CMS.
-// Child layouts override title/description etc. per-page via getPageMetadata(slug).
 export function getGlobalMetadata(): Metadata {
+  noStore()
   const base = getPageMetadata('')
   const content = getServerContent()
   const scId = content?.seo?.integrations?.googleSearchConsoleId?.trim()
@@ -68,6 +77,7 @@ export function getGlobalMetadata(): Metadata {
 }
 
 export function getPageMetadata(slug: string): Metadata {
+  noStore()
   const seo = getPageSEO(slug)
   if (!seo) return buildMetadata({ path: slug ? `/${slug}` : '/' })
   return buildMetadata({
@@ -81,6 +91,7 @@ export function getPageMetadata(slug: string): Metadata {
 }
 
 export function getServiceMetadata(slug: string): Metadata {
+  noStore()
   const service = getServiceBySlug(slug)
   if (!service) return buildMetadata({ path: `/services/${slug}` })
 
@@ -110,6 +121,7 @@ export function getServiceMetadata(slug: string): Metadata {
 }
 
 export function getCaseStudyMetadata(id: string): Metadata {
+  noStore()
   const caseStudy = getCaseStudyById(id)
   if (!caseStudy) return buildMetadata({ path: `/case-studies/${id}` })
 
@@ -139,6 +151,7 @@ export function getCaseStudyMetadata(id: string): Metadata {
 }
 
 export function getCustomPageMetadata(slug: string): Metadata {
+  noStore()
   const page = getCustomPageBySlug(slug)
   if (!page) return buildMetadata({ path: `/${slug}` })
 
@@ -150,5 +163,31 @@ export function getCustomPageMetadata(slug: string): Metadata {
     description: pageSeo?.metaDescription || pageData.subtitle || undefined,
     keywords: pageSeo?.keywords || undefined,
     path: `/${slug}`,
+  })
+}
+
+export function getBlogPostMetadata(id: string): Metadata {
+  noStore()
+  const post = getBlogPostById(id)
+  if (!post) return buildMetadata({ path: `/blog/${id}` })
+  const data = post.en || {}
+  return buildMetadata({
+    title: data.title ? `${data.title} | ${SITE_NAME}` : undefined,
+    description: data.summary || data.excerpt || data.description || undefined,
+    ogImage: post.imageUrl || undefined,
+    path: `/blog/${id}`,
+  })
+}
+
+export function getNewsItemMetadata(id: string): Metadata {
+  noStore()
+  const item = getNewsItemById(id)
+  if (!item) return buildMetadata({ path: `/news/${id}` })
+  const data = item.en || {}
+  return buildMetadata({
+    title: data.title ? `${data.title} | ${SITE_NAME}` : undefined,
+    description: data.summary || data.excerpt || data.description || undefined,
+    ogImage: item.imageUrl || undefined,
+    path: `/news/${id}`,
   })
 }
