@@ -1,8 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs'
 import path from 'path'
+import { revalidatePath } from 'next/cache'
 import { requireAuth } from '@/lib/auth'
 import { invalidateContentCache } from '@/lib/server-content'
+
+// All page paths that have SEO metadata and must be revalidated after any content save
+const ALL_PAGE_PATHS = [
+  '/',
+  '/about',
+  '/contact',
+  '/blog',
+  '/news',
+  '/careers',
+  '/faqs',
+  '/privacy',
+  '/terms',
+  '/services',
+  '/case-studies',
+]
+
+function revalidateAllPages() {
+  let count = 0
+  try {
+    // Revalidate the root layout — this cascades to all nested pages
+    revalidatePath('/', 'layout')
+    count++
+  } catch (e) {
+    console.warn('[v0] revalidatePath layout failed:', e)
+  }
+  for (const p of ALL_PAGE_PATHS) {
+    try {
+      revalidatePath(p, 'page')
+      count++
+    } catch (e) {
+      console.warn('[v0] revalidatePath failed for', p, e)
+    }
+  }
+  console.log('[v0] revalidatePath called for', count, 'paths — ISR cache cleared')
+}
 
 // File-based persistent storage with Hostinger optimization
 const DATA_DIR = path.join(process.cwd(), 'data')
@@ -454,6 +490,10 @@ export async function POST(request: NextRequest) {
 
     console.log('[v0] Save VERIFIED - content persisted to disk permanently in', elapsed, 'ms')
     invalidateContentCache()
+
+    // Invalidate Next.js ISR cache so every page re-renders with fresh metadata
+    // on the very next request — works with Hostinger's `next start` ISR setup.
+    revalidateAllPages()
 
     return NextResponse.json({
       success: true,
