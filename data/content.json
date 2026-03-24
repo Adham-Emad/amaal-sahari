@@ -876,6 +876,16 @@
     },
     "pages": [
       {
+        "id": "home",
+        "slug": "",
+        "metaTitle": "",
+        "metaDescription": "",
+        "metaKeywords": "",
+        "canonicalUrl": "",
+        "ogImage": "",
+        "twitterCard": ""
+      },
+      {
         "id": "about",
         "slug": "about",
         "metaTitle": "About",
@@ -886,11 +896,91 @@
         "twitterCard": ""
       },
       {
+        "id": "services",
+        "slug": "services",
+        "metaTitle": "",
+        "metaDescription": "",
+        "metaKeywords": "",
+        "canonicalUrl": "",
+        "ogImage": "",
+        "twitterCard": ""
+      },
+      {
+        "id": "blog",
+        "slug": "blog",
+        "metaTitle": "",
+        "metaDescription": "",
+        "metaKeywords": "",
+        "canonicalUrl": "",
+        "ogImage": "",
+        "twitterCard": ""
+      },
+      {
+        "id": "news",
+        "slug": "news",
+        "metaTitle": "",
+        "metaDescription": "",
+        "metaKeywords": "",
+        "canonicalUrl": "",
+        "ogImage": "",
+        "twitterCard": ""
+      },
+      {
         "id": "contact",
         "slug": "contact",
         "metaTitle": "Contact Title",
         "metaDescription": "This is a test for contact us",
         "metaKeywords": "Contact, Contact Us, Contact Test, Test",
+        "canonicalUrl": "",
+        "ogImage": "",
+        "twitterCard": ""
+      },
+      {
+        "id": "careers",
+        "slug": "careers",
+        "metaTitle": "",
+        "metaDescription": "",
+        "metaKeywords": "",
+        "canonicalUrl": "",
+        "ogImage": "",
+        "twitterCard": ""
+      },
+      {
+        "id": "faqs",
+        "slug": "faqs",
+        "metaTitle": "",
+        "metaDescription": "",
+        "metaKeywords": "",
+        "canonicalUrl": "",
+        "ogImage": "",
+        "twitterCard": ""
+      },
+      {
+        "id": "case-studies",
+        "slug": "case-studies",
+        "metaTitle": "",
+        "metaDescription": "",
+        "metaKeywords": "",
+        "canonicalUrl": "",
+        "ogImage": "",
+        "twitterCard": ""
+      },
+      {
+        "id": "privacy",
+        "slug": "privacy",
+        "metaTitle": "",
+        "metaDescription": "",
+        "metaKeywords": "",
+        "canonicalUrl": "",
+        "ogImage": "",
+        "twitterCard": ""
+      },
+      {
+        "id": "terms",
+        "slug": "terms",
+        "metaTitle": "",
+        "metaDescription": "",
+        "metaKeywords": "",
         "canonicalUrl": "",
         "ogImage": "",
         "twitterCard": ""

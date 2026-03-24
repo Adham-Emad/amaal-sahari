@@ -43,17 +43,28 @@ function blankEntry(slug: string): PageSEOEntry {
 export default function SeoEditor() {
   const { content, updateSection } = useContent()
   const [seo, setSeo] = useState(content.seo)
-  const [saved, setSaved] = useState(false)
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle")
   const [selectedSlug, setSelectedSlug] = useState("")
 
   useEffect(() => {
     setSeo(content.seo)
   }, [content.seo])
 
-  const handleSave = () => {
-    updateSection("seo", seo)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+  const handleSave = async () => {
+    setSaveState("saving")
+    try {
+      const ok = await updateSection("seo", seo)
+      if (ok) {
+        setSaveState("saved")
+        setTimeout(() => setSaveState("idle"), 3000)
+      } else {
+        setSaveState("error")
+        setTimeout(() => setSaveState("idle"), 5000)
+      }
+    } catch {
+      setSaveState("error")
+      setTimeout(() => setSaveState("idle"), 5000)
+    }
   }
 
   const getPageEntry = (slug: string): PageSEOEntry => {
@@ -80,9 +91,13 @@ export default function SeoEditor() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">SEO Settings</h2>
-        <Button onClick={handleSave} className="gap-2">
+        <Button
+          onClick={handleSave}
+          disabled={saveState === "saving"}
+          className={`gap-2 ${saveState === "error" ? "bg-red-600 hover:bg-red-700" : ""}`}
+        >
           <Save className="w-4 h-4" />
-          {saved ? "Saved!" : "Save Changes"}
+          {saveState === "saving" ? "Saving…" : saveState === "saved" ? "Saved!" : saveState === "error" ? "Save Failed — Retry" : "Save Changes"}
         </Button>
       </div>
 

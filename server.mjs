@@ -43,16 +43,17 @@ export function invalidateServerCache() { _content = null; _cacheAt = 0 }
 
 // ── URL → slug mapping ────────────────────────────────────────────────────────
 const SLUG_MAP = {
-  '/':         '',
-  '/about':    'about',
-  '/contact':  'contact',
-  '/blog':     'blog',
-  '/careers':  'careers',
-  '/news':     'news',
-  '/faqs':     'faqs',
-  '/privacy':  'privacy',
-  '/terms':    'terms',
-  '/services': 'services',
+  '/':              '',
+  '/about':         'about',
+  '/contact':       'contact',
+  '/blog':          'blog',
+  '/careers':       'careers',
+  '/news':          'news',
+  '/faqs':          'faqs',
+  '/privacy':       'privacy',
+  '/terms':         'terms',
+  '/services':      'services',
+  '/case-studies':  'case-studies',
 }
 
 function getMeta(pathname) {
@@ -60,9 +61,11 @@ function getMeta(pathname) {
   if (!c) return null
   const g    = c?.seo?.general || {}
   const norm = pathname.replace(/\/+$/, '') || '/'
-  const slug = Object.prototype.hasOwnProperty.call(SLUG_MAP, norm)
-    ? SLUG_MAP[norm] : '_dynamic_'
-  const page = (slug && slug !== '_dynamic_')
+  // slug can be '' for the home page — do NOT use truthiness check
+  const inMap = Object.prototype.hasOwnProperty.call(SLUG_MAP, norm)
+  const slug  = inMap ? SLUG_MAP[norm] : '_dynamic_'
+  // Find page-specific SEO only for known static pages (slug !== '_dynamic_')
+  const page = (inMap && slug !== '_dynamic_')
     ? (c?.seo?.pages || []).find(p => p.slug === slug) : null
   return {
     title:       page?.metaTitle       || g.defaultMetaTitle       || 'Amaal Sahari',

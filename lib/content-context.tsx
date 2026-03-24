@@ -857,7 +857,22 @@ const defaultContent: SiteContent = {
       metaKeywords: "facility management, cleaning services, security, workplace solutions",
       faviconUrl: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Amaal%20Sahari%20Web%20Logo-JeTkcT88yuJW3ZTgu8RnID1sBhHFbs.png",
     },
-    pages: [],
+    // Pre-seeded with blank entries for every known static page.
+    // Blank metaTitle/metaDescription fall through to general defaults in getPageSEO().
+    // Entries MUST exist here so the admin panel lists all pages from first load.
+    pages: [
+      { id: "home",         slug: "",             metaTitle: "", metaDescription: "", metaKeywords: "", canonicalUrl: "", ogImage: "", twitterCard: "" },
+      { id: "about",        slug: "about",        metaTitle: "", metaDescription: "", metaKeywords: "", canonicalUrl: "", ogImage: "", twitterCard: "" },
+      { id: "services",     slug: "services",     metaTitle: "", metaDescription: "", metaKeywords: "", canonicalUrl: "", ogImage: "", twitterCard: "" },
+      { id: "blog",         slug: "blog",         metaTitle: "", metaDescription: "", metaKeywords: "", canonicalUrl: "", ogImage: "", twitterCard: "" },
+      { id: "news",         slug: "news",         metaTitle: "", metaDescription: "", metaKeywords: "", canonicalUrl: "", ogImage: "", twitterCard: "" },
+      { id: "contact",      slug: "contact",      metaTitle: "", metaDescription: "", metaKeywords: "", canonicalUrl: "", ogImage: "", twitterCard: "" },
+      { id: "careers",      slug: "careers",      metaTitle: "", metaDescription: "", metaKeywords: "", canonicalUrl: "", ogImage: "", twitterCard: "" },
+      { id: "faqs",         slug: "faqs",         metaTitle: "", metaDescription: "", metaKeywords: "", canonicalUrl: "", ogImage: "", twitterCard: "" },
+      { id: "case-studies", slug: "case-studies", metaTitle: "", metaDescription: "", metaKeywords: "", canonicalUrl: "", ogImage: "", twitterCard: "" },
+      { id: "privacy",      slug: "privacy",      metaTitle: "", metaDescription: "", metaKeywords: "", canonicalUrl: "", ogImage: "", twitterCard: "" },
+      { id: "terms",        slug: "terms",        metaTitle: "", metaDescription: "", metaKeywords: "", canonicalUrl: "", ogImage: "", twitterCard: "" },
+    ],
     integrations: {
       googleSearchConsoleId: "",
       googleAnalyticsId: "",
@@ -964,9 +979,9 @@ const defaultContent: SiteContent = {
 interface ContentContextType {
   content: SiteContent
   isContentLoaded: boolean
-  updateContent: (newContent: Partial<SiteContent>) => void
-  updateSection: <K extends keyof SiteContent>(section: K, data: SiteContent[K]) => void
-  updateContact: (contact: SiteContent["contact"]) => void
+  updateContent: (newContent: Partial<SiteContent>) => Promise<boolean>
+  updateSection: <K extends keyof SiteContent>(section: K, data: SiteContent[K]) => Promise<boolean>
+  updateContact: (contact: SiteContent["contact"]) => Promise<boolean>
   resetToDefault: () => void
 }
 
@@ -1039,6 +1054,25 @@ const loadFromIndexedDB = async (): Promise<SiteContent | null> => {
   }
 }
 
+function mergeSeoPages(
+  defaultPages: SiteContent['seo']['pages'],
+  savedPages: SiteContent['seo']['pages']
+): SiteContent['seo']['pages'] {
+  // Start from defaults (all slugs present with blank values)
+  // then overwrite with server values where they exist.
+  const result = defaultPages.map(dp => {
+    const sp = savedPages.find(p => p.slug === dp.slug)
+    return sp ? { ...dp, ...sp } : dp
+  })
+  // Also include any extra slugs from server not in defaults (e.g. future pages)
+  for (const sp of savedPages) {
+    if (!result.find(p => p.slug === sp.slug)) {
+      result.push(sp)
+    }
+  }
+  return result
+}
+
 function deepMergeContent(defaults: SiteContent, saved: Partial<SiteContent>): SiteContent {
   const merged = { ...defaults } as any
   for (const key of Object.keys(saved) as Array<keyof SiteContent>) {
@@ -1053,7 +1087,17 @@ function deepMergeContent(defaults: SiteContent, saved: Partial<SiteContent>): S
       !Array.isArray(defaultVal) &&
       defaultVal !== null
     ) {
-      merged[key] = { ...defaultVal, ...savedVal }
+      // Special handling for the SEO section: merge pages arrays intelligently
+      if (key === 'seo') {
+        const mergedSeo = { ...defaultVal, ...savedVal }
+        // Merge pages arrays: server values win, default slugs fill gaps
+        if (Array.isArray(savedVal.pages) && Array.isArray(defaultVal.pages)) {
+          mergedSeo.pages = mergeSeoPages(defaultVal.pages, savedVal.pages)
+        }
+        merged[key] = mergedSeo
+      } else {
+        merged[key] = { ...defaultVal, ...savedVal }
+      }
     } else if (savedVal !== undefined) {
       merged[key] = savedVal
     }
@@ -1145,7 +1189,7 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('storage', handleStorageChange)
   }, [])
 
-  const saveContent = (newContent: SiteContent) => {
+  const saveContent = (newContent: SiteContent): Promise<boolean> => {
     setContent(newContent)
     
     // IMPORTANT: Save to SERVER first (persistent file storage for all users)
@@ -1226,15 +1270,6 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
       }
     }
     
-    // Start server save (async, with retries) and wait for completion
-    saveToServer().then((success) => {
-      if (success) {
-        console.log('[v0] Save workflow completed successfully')
-      } else {
-        console.warn('[v0] Save workflow completed with local-only storage')
-      }
-    })
-    
     // Save to IndexedDB (local backup - supports up to 50MB+)
     saveToIndexedDB(newContent).catch((error) => {
       console.error('[v0] Failed to save to IndexedDB:', error)
@@ -1250,23 +1285,33 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
         console.warn('[v0] localStorage quota exceeded, but data saved to server and IndexedDB')
       }
     }
+
+    // Return the server save Promise so callers can know if the save truly persisted
+    return saveToServer().then((success) => {
+      if (success) {
+        console.log('[v0] Save workflow completed — data persisted to server disk')
+      } else {
+        console.error('[v0] Save workflow FAILED — server did not persist the data. Local browser copy updated but public site unchanged.')
+      }
+      return success
+    })
   }
 
-  const updateContent = (newContent: Partial<SiteContent>) => {
+  const updateContent = (newContent: Partial<SiteContent>): Promise<boolean> => {
     const updated = { ...content, ...newContent }
-    saveContent(updated)
+    return saveContent(updated)
   }
 
-  const updateSection = <K extends keyof SiteContent>(section: K, data: SiteContent[K]) => {
+  const updateSection = <K extends keyof SiteContent>(section: K, data: SiteContent[K]): Promise<boolean> => {
     cacheBustVersion = Date.now()
     const bustData = bustImageCaches(data)
-    saveContent({ ...content, [section]: bustData })
+    return saveContent({ ...content, [section]: bustData })
   }
 
-  const updateContact = (contact: SiteContent["contact"]) => {
+  const updateContact = (contact: SiteContent["contact"]): Promise<boolean> => {
     cacheBustVersion = Date.now()
     const bustData = bustImageCaches(contact)
-    saveContent({ ...content, contact: bustData })
+    return saveContent({ ...content, contact: bustData })
   }
 
   const resetToDefault = () => {
